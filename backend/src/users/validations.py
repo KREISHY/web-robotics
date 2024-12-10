@@ -1,4 +1,6 @@
 import re
+
+from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from users.models import User, EmailVerify, PasswordReset
 
@@ -132,3 +134,29 @@ def custom_validate_reset_verify_password(data, url):
         raise serializers.ValidationError({'password': 'Пожалуйста, заполните поле пароля.'})
 
     custom_validate_password(password)
+
+
+
+def custom_validate_user_login(data):
+    custom_validate_email_login(data)
+    custom_validate_password_login(data)
+
+def custom_validate_email_login(data):
+    email = data.get('email')
+    if not email:
+        raise serializers.ValidationError({"email": "Пожалуйста, введите почту."})
+
+    user = User.objects.filter(email=email).first()
+    if not user:
+        raise serializers.ValidationError({"email": "Пользователь с такой почтой не найден."})
+
+def custom_validate_password_login(data):
+    password = data.get('password')
+    email = data.get('email')
+
+    if not password:
+        raise serializers.ValidationError({"password": "Пожалуйста, введите пароль."})
+
+    user = User.objects.filter(email=email).first()
+    if user and not check_password(password, user.password):
+        raise serializers.ValidationError({"password": "Неверный пароль."})

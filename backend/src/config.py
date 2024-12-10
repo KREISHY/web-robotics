@@ -1,6 +1,6 @@
 SUPERUSER_EMAIL = 'admin@admin.ru'
 SUPERUSER_PASSWORD = 'admin123!'
-URL = 'http://localhost:8000/api/v0/'
+URL = 'http://localhost:8000/api/user/'
 PASSWORD_RESET_TOKEN_LIFETIME = 24
 EMAIL_VERIFY_TOKEN_LIFETIME = 24
 EMAIL_HOST = None

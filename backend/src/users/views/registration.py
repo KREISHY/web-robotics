@@ -6,6 +6,9 @@ from users.serializers import UserRegistrationsSerializer
 
 
 class UserRegistrationView(viewsets.ModelViewSet):
+    """
+    Регистрация пользователя
+    """
     serializer_class = UserRegistrationsSerializer
     queryset = User.objects.none()
     http_method_names = ['get', 'post' ,'head', 'options', 'list']

@@ -7,6 +7,9 @@ from users.serializers import PasswordResetRequestSerializer, PasswordResetVerif
 
 
 class ResetPasswordRequestView(viewsets.ModelViewSet):
+    """
+    Восстановление пароля
+    """
     serializer_class = PasswordResetRequestSerializer
     queryset = PasswordReset.objects.none()
     http_method_names = ['get', 'post' ,'head', 'options', 'list']

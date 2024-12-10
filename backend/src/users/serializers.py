@@ -1,17 +1,18 @@
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 from config import URL
 from users.models import User, EmailVerify, PasswordReset
 from users.validations import custom_validate_register, custom_validate_token, custom_validate_reset_request_password, \
-    custom_validate_reset_verify_password
+    custom_validate_reset_verify_password, custom_validate_user_login
 
 
 class UserCurrentSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'last_name', 'first_name', 'patronymic', 'password']
+        fields = ['email', 'last_name', 'first_name', 'patronymic']
 
 
 class UserRegistrationsSerializer(serializers.ModelSerializer):
@@ -41,7 +42,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         token = EmailVerify.objects.create(user=user)
         EmailMessage(
             'Подтверждение почты', 
-            f'URL: {URL}verify/{token.url}\n{token.code}',
+            f'URL: {URL}email/verify/{token.url}\n{token.code}',
             to=[user.email]
         ).send()
         return user
@@ -125,3 +126,27 @@ class PasswordResetVerifySerializer(serializers.ModelSerializer):
         user.save()
         reset.delete()
         return user
+
+
+class UserLoginSerializer(ModelSerializer):
+    email = serializers.EmailField(required=True, error_messages={
+        "required": "Поле email обязательно.",
+        "blank": "Поле email не может быть пустым.",
+    })
+
+    password = serializers.CharField(write_only=True, required=True, error_messages={
+        "required": "Поле пароль обязательно.",
+        "blank": "Поле пароль не может быть пустым.",
+    })
+
+
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+
+    def validate(self, data):
+        custom_validate_user_login(data)
+        return data
+
+

@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from users.models import EmailVerify
@@ -10,11 +11,8 @@ class EmailTokenConfirmationView(viewsets.ModelViewSet):
     http_method_names = ['get', 'post' ,'head', 'options', 'list']
     permission_classes = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_200_OK)
-
-    def create(self, request, *args, **kwargs):
-        url = kwargs.get('url')
+    @action(detail=False, methods=['post'], url_path='verify/(?P<url>[^/.]+)', name='verify')
+    def confirm_email(self, request, url=None, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'url': url})
         if serializer.is_valid():
             serializer.save()
