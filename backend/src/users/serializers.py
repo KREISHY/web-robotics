@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from config import URL
+from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_PASSWORD_RESET_VERIFY
 from users.models import User, EmailVerify, PasswordReset
 from users.validations import custom_validate_register, custom_validate_token, custom_validate_reset_request_password, \
     custom_validate_reset_verify_password, custom_validate_user_login
@@ -21,13 +21,18 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         fields = ['email', 'password', 'last_name', 'first_name', 'patronymic', 'password']
         extra_kwargs = {
             "email": {
-                "error_messages": {"required": "Укажите ваш email.", "blank": "Пожалуйста, заполните поле почты."}},
+                "error_messages": {
+                    "required": "Укажите ваш email.",
+                    "blank": "Пожалуйста, напишите вашу почты.",
+                    "invalid": "Пожалуйста, введите корректный адрес почты.",
+                }
+            },
             "password": {
-                "error_messages": {"required": "Введите пароль.", "blank": "Пожалуйста, заполните поле пароля."}},
+                "error_messages": {"required": "Введите пароль.", "blank": "Пожалуйста, напишите ваш пароль."}},
             "last_name": {
-                "error_messages": {"required": "Введите фамилию.", "blank": "Пожалуйста, заполните поле фамилии."}},
+                "error_messages": {"required": "Введите фамилию.", "blank": "Пожалуйста, напишите вашу фамилию."}},
             "first_name": {
-                "error_messages": {"required": "Введите имя.", "blank": "Пожалуйста, заполните поле имени."}},
+                "error_messages": {"required": "Введите имя.", "blank": "Пожалуйста, напишите ваше имя."}},
         }
 
     def create(self, validated_data):
@@ -42,7 +47,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         token = EmailVerify.objects.create(user=user)
         EmailMessage(
             'Подтверждение почты', 
-            f'URL: {URL}email/verify/{token.url}\n{token.code}',
+            f'URL: {ROOT_URL + URL_USERS_API + URL_EMAIL_VERIFY}{token.url}\n{token.code}',
             to=[user.email]
         ).send()
         return user
@@ -57,9 +62,9 @@ class EmailTokenCreationSerializer(serializers.ModelSerializer):
         fields = ['code', 'url']
         extra_kwargs = {
             "code": {
-                "error_messages": {"required": "Невалидный код.", "blank": "Пожалуйста, заполните поле кода."}},
+                "error_messages": {"required": "Пожалуйста, заполните поле кода.", "blank": "Пожалуйста, напишите ваш код."}},
             "url": {
-                "error_messages": {"required": "Невалидный URL.", "blank": "Пожалуйста, заполните поле URL."}},
+                "error_messages": {"required": "Пожалуйста, заполните поле URL.", "blank": "Пожалуйста, напишите ваш URL."}},
         }
 
     def create(self, validated_data):
@@ -83,18 +88,24 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
         fields = ['email']
         extra_kwargs = {
             "email": {
-                "error_messages": {"required": "Невалидный код.", "blank": "Пожалуйста, заполните поле email."}},
+                "error_messages": {
+                    "required": "Пожалуйста, напишите вашу почту.",
+                    "blank": "Пожалуйста, напишите вашу почту.",
+                    "invalid": "Пожалуйста, введите корректный адрес почты.",
+                }
+            },
         }
 
 
     def create(self, validated_data):
-        reset = PasswordReset.objects.create(email=validated_data['email'])
+        PasswordReset.objects.filter(email=validated_data['email']).delete()
+        reset_token = PasswordReset.objects.create(email=validated_data['email'])
         EmailMessage(
             'Сброс пароля',
-            f'URL: {URL}reset/password/confrim/{reset.url}\n{reset.code}',
-            to=[reset.email]
+            f'URL: {ROOT_URL + URL_USERS_API + URL_PASSWORD_RESET_VERIFY}{reset_token.url}\n{reset_token.code}',
+            to=[reset_token.email]
         ).send()
-        return reset
+        return reset_token
 
     def validate(self, data):
         custom_validate_reset_request_password(data)
@@ -102,8 +113,8 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
 
 class PasswordResetVerifySerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, error_messages={
-        "required": "Невалидный URL.",
-        "blank": "Пожалуйста, заполните поле password."
+        "required": "Пожалуйста, напишите свой пароль.",
+        "blank": "Пожалуйста, напишите свой пароль."
     })
 
     class Meta:
@@ -111,7 +122,8 @@ class PasswordResetVerifySerializer(serializers.ModelSerializer):
         fields = ['code', 'password']
         extra_kwargs = {
             "code": {
-                "error_messages": {"required": "Невалидный код.", "blank": "Пожалуйста, заполните поле кода."}},
+                "error_messages": {"required": "Пожалуйста, напишите код.",
+                                   "blank": "Пожалуйста, напишите код."}},
         }
 
     def validate(self, data):
@@ -130,13 +142,14 @@ class PasswordResetVerifySerializer(serializers.ModelSerializer):
 
 class UserLoginSerializer(ModelSerializer):
     email = serializers.EmailField(required=True, error_messages={
-        "required": "Поле email обязательно.",
-        "blank": "Поле email не может быть пустым.",
+        "required": "Пожалуйста, напишите вашу почту.",
+        "blank": "Пожалуйста, напишите вашу почту.",
+        "invalid": "Пожалуйста, введите корректный адрес почты.",
     })
 
     password = serializers.CharField(write_only=True, required=True, error_messages={
-        "required": "Поле пароль обязательно.",
-        "blank": "Поле пароль не может быть пустым.",
+        "required": "Пожалуйста, напишите ваш пароль.",
+        "blank": "Пожалуйста, напишите ваш пароль.",
     })
 
 

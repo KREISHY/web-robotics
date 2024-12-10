@@ -6,12 +6,17 @@ from users.models import EmailVerify
 from users.serializers import EmailTokenCreationSerializer
 
 class EmailTokenConfirmationView(viewsets.ModelViewSet):
+    """
+    Подтверждение почты
+    - Работает только если вы перешли на URL указанный в письме при регистрации
+    - Требует код указанный в письме
+    """
     serializer_class = EmailTokenCreationSerializer
     queryset = EmailVerify.objects.none()
     http_method_names = ['get', 'post' ,'head', 'options', 'list']
     permission_classes = [permissions.AllowAny]
 
-    @action(detail=False, methods=['post'], url_path='verify/(?P<url>[^/.]+)', name='verify')
+    @action(detail=False, methods=['post'], url_path='(?P<url>[^/.]+)')
     def confirm_email(self, request, url=None, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'url': url})
         if serializer.is_valid():

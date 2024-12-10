@@ -2,52 +2,90 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
+from users.models import User
 from users.serializers import UserCurrentSerializer, UserLoginSerializer
 
 
-class UserViewSet(viewsets.ViewSet):
+class CurrentUserViewSet(viewsets.ViewSet):
     """
-    UserViewSet предоставляет два действия:
-    - Вход пользователя (login)
-    - Выход пользователя (logout)
+    Текущий пользователь
+    Если пользователь не авторизирован указывает пустые поля
     """
     serializer_class = UserCurrentSerializer
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
-        """
-        Возвращает информацию о текущем пользователе.
-        Если пользователь не аутентифицирован, возвращает сериализованные пустые данные.
-        """
         user = request.user
 
         if user.is_authenticated:
             serializer = UserCurrentSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # Создаем пустой объект для возврата структуры сериализатора с пустыми значениями
-            empty_user_data = {field: "" for field in UserCurrentSerializer.Meta.fields}
-            return Response(empty_user_data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post'], url_path='login', permission_classes=[permissions.AllowAny], serializer_class=UserLoginSerializer)
-    def login(self, request, *args, **kwargs):
-        serializer = UserLoginSerializer(data=request.data)
+
+        empty_user_data = {field: "" for field in UserCurrentSerializer.Meta.fields}
+        return Response(empty_user_data, status=status.HTTP_200_OK)
+
+
+class UserLoginViewSet(ModelViewSet):
+    """
+    Вход в систему
+    """
+    model = User
+    queryset = User.objects.none
+    serializer_class = UserLoginSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return Response({
+                'status': 'authenticated', 'message': 'Вы уже вошли в систему'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return Response(status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if request.user.is_authenticated:
+            return Response({
+                'status': 'authenticated', 'message': 'Вы уже вошли в систему'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data['password']
+            email = serializer.validated_data.get('email')
+            password = serializer.validated_data.get('password')
             user = authenticate(request, email=email, password=password)
             if user:
                 login(request, user)
-                return Response({'status': 'success', 'message': 'Вы успешно вошли в систему'}, status=status.HTTP_200_OK)
-            return Response({'status': 'error', 'message': 'Неверные учетные данные'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(status=status.HTTP_200_OK)
+            return Response({'status': 'error', 'message': 'Предоставлены неверные данные'},
+                            status=status.HTTP_401_UNAUTHORIZED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    @action(detail=False, methods=['post'], url_path='logout', permission_classes=[permissions.IsAuthenticated])
-    def logout(self, request, *args, **kwargs):
-        try:
+class UserLogoutViewSet(viewsets.ViewSet):
+    """
+    Выход из системы
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
             logout(request)
-            return Response({'status': 'success', 'message': 'Вы успешно вышли из системы'}, status=status.HTTP_200_OK)
-        except:
-            return Response({'status': 'error', 'message': 'Произошла ошибка при выходе'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'status': 'success', 'message': 'Вы успешно вышли из системы'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+        return Response(
+            {'status': 'error', 'message': 'Пользователь не авторизирован или уже вышел из системы'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )

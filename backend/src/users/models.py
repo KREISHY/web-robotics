@@ -149,7 +149,7 @@ class EmailVerify(models.Model):
         verbose_name_plural = "Токены-верификации почты"
 
 class PasswordReset(models.Model):
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     code = models.IntegerField(default=generate_random_code)
     url = models.CharField(default=generate_uuid, editable=False, max_length=36)
     created_date = models.DateTimeField(auto_now_add=True)

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
-from users.models import User, EmailVerify
+from users.models import User, EmailVerify, PasswordReset
 
 
 @admin.register(User)
@@ -22,3 +22,12 @@ class Token(ModelAdmin):
         ('Token info', {'fields': ('user', 'url', 'code', 'created_date')}),
     )
     readonly_fields = ('user', 'code', 'url', 'created_date',)
+
+
+@admin.register(PasswordReset)
+class PasswordResetAdmin(ModelAdmin):
+    list_display = ('email', 'code', 'url', 'created_date',)
+    fieldsets = (
+        ('Reset Info', {'fields': ('email', 'code', 'url', 'created_date')}),
+    )
+    readonly_fields = ('email', 'code', 'url', 'created_date',)

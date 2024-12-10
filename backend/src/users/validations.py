@@ -38,24 +38,24 @@ def custom_validate_patronymic(patronymic):
 def custom_validate_register(data):
     email = data.get('email')
     if not email:
-        raise serializers.ValidationError({'email': 'Пожалуйста, заполните поле почты.'})
+        raise serializers.ValidationError({'email': 'Пожалуйста, введите вашу почту.'})
     if User.objects.filter(email=email).exists():
         raise serializers.ValidationError({'email': 'Эта почта уже используется.'})
     custom_validate_email(email)
 
     password = data.get('password')
     if not password:
-        raise serializers.ValidationError({'password': 'Пожалуйста, заполните поле пароля.'})
+        raise serializers.ValidationError({'password': 'Пожалуйста, заполните ваш пароля.'})
     custom_validate_password(password)
 
     last_name = data.get('last_name')
     if not last_name:
-        raise serializers.ValidationError({'last_name': 'Пожалуйста, заполните поле фамилии.'})
+        raise serializers.ValidationError({'last_name': 'Пожалуйста, заполните вашу фамилии.'})
     custom_validate_last_name(last_name)
 
     first_name = data.get('first_name')
     if not first_name:
-        raise serializers.ValidationError({'first_name': 'Пожалуйста, заполните поле имени.'})
+        raise serializers.ValidationError({'first_name': 'Пожалуйста, заполните ваше имени.'})
     custom_validate_first_name(first_name)
 
     patronymic = data.get('patronymic')
@@ -76,9 +76,9 @@ def custom_validate_email_token_url(url):
 def custom_validate_email_token_code(data, url):
     code = data.get('code')
     if code is None:
-        raise serializers.ValidationError({'code': "Поле 'code' обязательно для заполнения."})
+        raise serializers.ValidationError({'code': "Пожалуйста, введите ваш код."})
     if not isinstance(code, int):
-        raise serializers.ValidationError({'code': "Поле 'code' должно быть числом."})
+        raise serializers.ValidationError({'code': "Код должен быть числом."})
     if not (100000 <= code <= 999999):
         raise serializers.ValidationError({'code': "Код должен быть шестизначным."})
 
@@ -89,7 +89,7 @@ def custom_validate_email_token_code(data, url):
     if token.is_expired():
         token.user.delete()
         token.delete()
-        raise serializers.ValidationError({'code': "Токен подтверждения истек."})
+        raise serializers.ValidationError({'code': "Истекло время за которое можно поменять пароль."})
 
     if token.user.is_active:
         raise serializers.ValidationError({'code': "Почта уже подтверждена."})
@@ -105,6 +105,7 @@ def custom_validate_reset_request_password(data):
         raise serializers.ValidationError({'email': 'Пользователя с данной почтой не существует.'})
     if not user.is_active and not user.email_confirmed:
         raise serializers.ValidationError({'email': 'Подтвердите почту, чтобы затем сменить пароль.'})
+
 
 # Валидация сброса пароля
 def custom_validate_reset_verify_password(data, url):
@@ -144,7 +145,7 @@ def custom_validate_user_login(data):
 def custom_validate_email_login(data):
     email = data.get('email')
     if not email:
-        raise serializers.ValidationError({"email": "Пожалуйста, введите почту."})
+        raise serializers.ValidationError({"email": "Пожалуйста, введите вашу почту."})
 
     user = User.objects.filter(email=email).first()
     if not user:
@@ -155,7 +156,7 @@ def custom_validate_password_login(data):
     email = data.get('email')
 
     if not password:
-        raise serializers.ValidationError({"password": "Пожалуйста, введите пароль."})
+        raise serializers.ValidationError({"password": "Пожалуйста, введите ваш пароль."})
 
     user = User.objects.filter(email=email).first()
     if user and not check_password(password, user.password):

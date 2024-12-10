@@ -1,5 +1,5 @@
-from django.core.validators import validate_email
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from users.models import PasswordReset
@@ -25,7 +25,7 @@ class ResetPasswordRequestView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ResetPasswordConfrimView(viewsets.ModelViewSet):
+class ResetPasswordConfirmationView(viewsets.ModelViewSet):
     serializer_class = PasswordResetVerifySerializer
     queryset = PasswordReset.objects.none()
     http_method_names = ['get', 'post', 'head', 'options', 'list']
@@ -34,10 +34,11 @@ class ResetPasswordConfrimView(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)
 
-    def create(self, request, *args, **kwargs):
-        url = kwargs.get('url')
+    @action(detail=False, methods=['post'], url_path='(?P<url>[^/.]+)')
+    def confirm_password_password_reset(self, request, url=None, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'url': url})
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
