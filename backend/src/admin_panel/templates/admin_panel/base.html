@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Приложение авторизации{% endblock %}</title>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav>
+
+        <!-- Проверяем что авторизированны -->
+        {% if user.is_authenticated %}
+            Добро пожаловать, {{ user.username }}!
+            <a href="">Выйти</a>
+        {% else %}
+            <!-- TODO: Ссылку на авторизацию -->
+            <a href="">Войти</a>
+        {% endif %}
+    </nav>
+
+
+    <main>
+        {% block content %}
+
+        {% endblock %}
+    </main>
+</body>
+</html>

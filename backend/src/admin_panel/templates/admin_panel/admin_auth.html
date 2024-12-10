@@ -1,0 +1,33 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Авторизация{% endblock %}
+
+{% block content %}
+    <!-- TODO: Добавить поля для заполнения-->
+    <h1>Hello world!</h1>
+{% endblock %}
+
+<script src="{% static 'rest_framework/js/jquery-3.7.1.min.js' %}"></script>
+
+<script>
+    <!-- TODO: Отправить на api логина запрос с данными-->
+    $(document).ready(function() {
+        $('').on('click', function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: 'example',
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                data: JSON.stringify({}),
+                success: function() {
+                },
+                error: function(xhr, status, error) {
+                },
+            });
+        });
+    });
+</script>
