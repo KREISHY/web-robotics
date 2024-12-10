@@ -7,22 +7,44 @@
 <body>
     <!-- Навигация -->
     <nav>
-
-        <!-- Проверяем что авторизированны -->
         {% if user.is_authenticated %}
-            Добро пожаловать, {{ user.username }}!
-            <a href="">Выйти</a>
+            Добро пожаловать, {{ user.email }}!
+            <a href="{% url 'logout' %}" id="logout-link">Выйти</a>
         {% else %}
-            <!-- TODO: Ссылку на авторизацию -->
-            <a href="">Войти</a>
+            <a href="{% url 'admin-login' %}">Войти</a>
         {% endif %}
     </nav>
 
-
     <main>
         {% block content %}
-
+        1232
         {% endblock %}
     </main>
+
+    <script>
+        document.querySelector('#logout-link')?.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            fetch('{% url "logout" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      window.location.href = '{% url "admin-login" %}';
+                  } else {
+                      alert('Ошибка при выходе.');
+                  }
+              });
+        });
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
 </body>
 </html>
