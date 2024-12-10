@@ -21,4 +21,4 @@ migrate:
 entry-point:
 	export DJANGO_SETTINGS_MODULE=project.settings && venv/bin/python3 src/entrypoint.py
 
-build: start-venv entry-point migrate
+build: start-venv migrate entry-point
