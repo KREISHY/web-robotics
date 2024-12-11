@@ -1,5 +1,8 @@
 from django.contrib import admin
+
+from api_v0.views.Experiment_view import ExperimentViewSet
 from .models import Competition, Criteria, Log, Score, Teams
+from .models.experiment import Experiment
 
 
 @admin.register(Competition)
@@ -45,3 +48,12 @@ class TeamsAdmin(admin.ModelAdmin):
     list_editable = ('status',)
     list_per_page = 20
     ordering = ('name',)  # Сортировка по алфавиту
+
+
+@admin.register(Experiment)
+class ExperimentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'competition')  # Отображаемые поля в списке
+    list_filter = ('competition__name',)  # Фильтр по названию соревнования
+    search_fields = ('name', 'competition__name')  # Поля для поиска
+    list_per_page = 20  # Количество элементов на страницу
+    ordering = ('name',)  # Сортировка по имени
