@@ -6,6 +6,7 @@ import Home from './Pages/Home';
 import LoginPage from './Pages/Profile';
 import Footer from './Footer';
 import NavbarMain from "./Pages/Components/NavbarMain";
+import TableTests from "./Pages/TableTests";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         {/* Добавлен маршрут для страницы логина */}
                         <Route path="/login" element={<LoginPage />} />
+                        <Route path="/table-teams" element={<TableTests nameTeam={'Питонисты'} />} />
                     </Routes>
                 </BrowserRouter>
             </div>
