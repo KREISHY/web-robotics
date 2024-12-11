@@ -41,5 +41,5 @@ class Score(models.Model):
         return f'{self.competition} {self.criteria} {self.score}'
 
     class Meta:
-        verbose_name = 'Балл'
-        verbose_name_plural = 'Баллы'
+        verbose_name = 'Балл за испытание'
+        verbose_name_plural = 'Баллы за испытания'
