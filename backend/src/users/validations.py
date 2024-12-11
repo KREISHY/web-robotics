@@ -46,6 +46,7 @@ def custom_validate_username(username):
     if User.objects.filter(username=username).exists():
         raise serializers.ValidationError({'username': 'Это имя пользователя уже занято. Пожалуйста, выберите другое.'})
 
+
 # Валидация регистрации
 def custom_validate_register(data):
     email = data.get('email')
@@ -71,6 +72,9 @@ def custom_validate_register(data):
     patronymic = data.get('patronymic')
     if patronymic:
         custom_validate_patronymic(patronymic)
+
+    username = data.get('username')
+    custom_validate_username(username)
 
 # Валидация токенов
 def custom_validate_token(data, url):
