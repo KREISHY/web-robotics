@@ -4,6 +4,7 @@ from users.models import User
 from .teams import Teams
 from django.utils.timezone import now
 
+
 class Competition(models.Model):
     name = models.CharField(
         max_length=255,
@@ -33,8 +34,7 @@ class Competition(models.Model):
         verbose_name = "Соревнование"
         verbose_name_plural = "Соревнования"
 
-
-    def registrations_is_running(self):# Текущее время
+    def registrations_is_running(self):  # Текущее время
         return self.start_registration <= now() <= self.end_registration
 
 
@@ -48,6 +48,3 @@ class CompetitionJudges(models.Model):
         Competition,
         on_delete=models.CASCADE,
     )
-
-
-
