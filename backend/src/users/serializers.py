@@ -78,6 +78,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         custom_validate_register(data)
         return data
 
+
 class EmailTokenCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailVerify
@@ -104,6 +105,7 @@ class EmailTokenCreationSerializer(serializers.ModelSerializer):
         custom_validate_token(data, url)
         return data
 
+
 class PasswordResetRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = PasswordReset
@@ -119,7 +121,6 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
             },
         }
 
-
     def create(self, validated_data):
         PasswordReset.objects.filter(email=validated_data['email']).delete()
         reset_token = PasswordReset.objects.create(email=validated_data['email'])
@@ -133,6 +134,7 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
     def validate(self, data):
         custom_validate_reset_request_password(data)
         return data
+
 
 class PasswordResetVerifySerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, error_messages={
@@ -175,11 +177,9 @@ class UserLoginByEmailSerializer(ModelSerializer):
         "blank": "Пожалуйста, напишите ваш пароль.",
     })
 
-
     class Meta:
         model = User
         fields = ['email', 'password']
-
 
     def validate(self, data):
         custom_validate_user_login(data)

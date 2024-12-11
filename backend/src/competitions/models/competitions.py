@@ -7,11 +7,7 @@ class Competition(models.Model):
         max_length=255,
         verbose_name='Название соревнования'
     )
-    team = models.ForeignKey(
-        Teams,
-        on_delete=models.CASCADE,
-        verbose_name='Команда',
-    )
+
     description = models.TextField(
         blank=True,
         null=True,
@@ -32,3 +28,15 @@ class Competition(models.Model):
     class Meta:
         verbose_name = "Соревнование"
         verbose_name_plural = "Соревнования"
+
+
+class CompetitionTeam(models.Model):
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.CASCADE,
+        related_name='teams',
+    )
+    team = models.ForeignKey(
+        Teams,
+        on_delete=models.CASCADE,
+    )
