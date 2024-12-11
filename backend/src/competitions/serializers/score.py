@@ -9,6 +9,11 @@ class ScoreSerializer(serializers.ModelSerializer):
     judge_name = serializers.CharField(source='judge_user.username', read_only=True)
     experiment_name = serializers.CharField(source='experiment.name', read_only=True)
 
+    competition_id = serializers.CharField(source='competition.id', read_only=True)
+    criteria_id = serializers.CharField(source='criteria.id', read_only=True)
+    judge_id = serializers.CharField(source='judge_user.id', read_only=True)
+    experiment_id = serializers.CharField(source='experiment.id', read_only=True)
+
     competition = serializers.PrimaryKeyRelatedField(queryset=Competition.objects.all(), write_only=True)
     judge_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
     criteria = serializers.PrimaryKeyRelatedField(queryset=Criteria.objects.all(), write_only=True)
@@ -21,9 +26,14 @@ class ScoreSerializer(serializers.ModelSerializer):
             'judge_user', 'judge_name',
             'criteria', 'criteria_name',
             'experiment', 'experiment_name',
+            'competition_id', 'criteria_id', 'judge_id', 'experiment_id',
             'score', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'competition_name', 'judge_name', 'criteria_name', 'experiment_name', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id', 'competition_name', 'judge_name', 'criteria_name', 'experiment_name',
+            'competition_id', 'criteria_id', 'judge_id', 'experiment_id',
+            'created_at', 'updated_at'
+        ]
         extra_kwargs = {
             'score': {
                 'required': True,
