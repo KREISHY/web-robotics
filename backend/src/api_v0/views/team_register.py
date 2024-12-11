@@ -1,5 +1,4 @@
 from rest_framework import viewsets, permissions, status
-from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from competitions.models import Teams, Competition
@@ -7,23 +6,10 @@ from competitions.serializers.team import TeamRegisterSerializer, TeamSSerialize
 
 
 class TeamsViewSet(viewsets.ModelViewSet):
+    queryset = Teams.objects.all()
     serializer_class = TeamSSerializer
+    http_method_names = ['get', 'post', 'head', 'options', 'list']
     permission_classes = [permissions.AllowAny]
-    http_method_names = ['get', 'head', 'options', 'head', 'list']
-
-    def get_queryset(self):
-        competition_id = self.request.query_params.get('competition_id')
-
-        if competition_id is not None:
-            try:
-                queryset = Teams.objects.filter(competition_id=competition_id)
-                if not queryset.exists():
-                    raise NotFound('No teams found for the provided competition_id.')
-                return queryset
-            except ValueError:
-                raise NotFound('Invalid competition_id provided.')
-        return Teams.objects.all()
-
 
 
 class TeamRegisterViewSet(viewsets.ModelViewSet):
