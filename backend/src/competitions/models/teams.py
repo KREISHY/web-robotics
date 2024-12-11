@@ -13,8 +13,11 @@ class Teams(models.Model):
     robot_name = models.CharField(max_length=255, verbose_name="Название робота")
     city = models.CharField(max_length=255, verbose_name="Город")
     institution = models.CharField(max_length=255, verbose_name="Учебное заведение")
-    # member_count = models.PositiveIntegerField(verbose_name="Количество участников")
-    # leader_name = models.CharField(max_length=255, verbose_name="ФИО руководителя")
+    members = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Члены команды',
+    )
     leader = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
