@@ -67,7 +67,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
             is_active=False,
             username= validated_data.get('username', ''),
         )
-        token = EmailVerify.objgitects.create(user=user)
+        token = EmailVerify.objects.create(user=user)
         EmailMessage(
             'Подтверждение почты', 
             f'URL: {ROOT_URL + URL_USERS_API + URL_EMAIL_VERIFY}{token.url}\n{token.code}',
