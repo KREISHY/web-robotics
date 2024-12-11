@@ -3,6 +3,7 @@ from competitions.models import Score
 from competitions.models import Competition, Criteria
 from users.models import User
 from competitions.models import Teams  # Импортируем модель Teams
+from competitions.serializers import CriteriaSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,13 +18,6 @@ class CompetitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Competition
         fields = ['name', 'description', 'created_at', ]
-
-
-class CriteriaSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Criteria."""
-    class Meta:
-        model = Criteria
-        fields = ['id', 'name', 'weight']
 
 
 class TeamSerializer(serializers.ModelSerializer):
