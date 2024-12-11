@@ -30,15 +30,3 @@ class Competition(models.Model):
     class Meta:
         verbose_name = "Соревнование"
         verbose_name_plural = "Соревнования"
-
-
-class CompetitionTeam(models.Model):
-    competition = models.ForeignKey(
-        Competition,
-        on_delete=models.CASCADE,
-        related_name='teams',
-    )
-    team = models.ForeignKey(
-        Teams,
-        on_delete=models.CASCADE,
-    )

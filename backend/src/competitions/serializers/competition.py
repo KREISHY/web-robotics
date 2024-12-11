@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from competitions.models import Competition, CompetitionTeam
+from competitions.models import Competition
 
 
 class CompetitionSerializer(serializers.ModelSerializer):
@@ -48,12 +48,3 @@ class CompetitionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Соревнование с таким названием уже существует.")
         return value
 
-
-class CompetitionTeamSerializer(serializers.ModelSerializer):
-    # Сериализатор для модели CompetitionTeam
-    competition = CompetitionSerializer()  # Вложенный сериализатор для Competition
-    team = serializers.StringRelatedField()  # Просто отображаем имя команды (или можно использовать вложенный сериализатор для Teams)
-
-    class Meta:
-        model = CompetitionTeam
-        fields = ['competition', 'team']

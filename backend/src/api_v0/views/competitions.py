@@ -1,8 +1,8 @@
 from django.utils.timezone import now
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from competitions.models import Competition, CompetitionTeam
-from competitions.serializers.competition import CompetitionSerializer, CompetitionTeamSerializer
+from competitions.models import Competition
+from competitions.serializers.competition import CompetitionSerializer
 
 
 class CompetitionViewSet(ModelViewSet):
@@ -47,24 +47,3 @@ class CompetitionViewSet(ModelViewSet):
             permission_classes = [IsAuthenticatedOrReadOnly]
         return [permission() for permission in permission_classes]
 
-
-class CompetitionTeamViewSet(ModelViewSet):
-    """
-    ViewSet для модели CompetitionTeam.
-    """
-    queryset = CompetitionTeam.objects.select_related('competition', 'team')  # Оптимизация запросов
-    serializer_class = CompetitionTeamSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_queryset(self):
-        """
-        Фильтрация по соревнованию или команде через GET-параметры.
-        """
-        queryset = super().get_queryset()
-        competition_id = self.request.query_params.get('competition', None)
-        team_id = self.request.query_params.get('team', None)
-        if competition_id:
-            queryset = queryset.filter(competition_id=competition_id)
-        if team_id:
-            queryset = queryset.filter(team_id=team_id)
-        return queryset
