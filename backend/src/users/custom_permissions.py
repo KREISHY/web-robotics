@@ -17,3 +17,8 @@ class IsAuthenticatedAndIsJudgeOrOperator(BasePermission):
     def has_permission(self, request, view):
         return bool(request.user.is_superuser or (request.user and request.user.is_authenticated and
                     (request.user.is_judge or request.user.is_judge_operator)))
+
+
+class IsAuthenticatedAndIsSuperuser(BasePermission):
+    def has_permission(self, request, view):
+        return bool((request.user and request.user.is_authenticated and request.user.is_superuser))
