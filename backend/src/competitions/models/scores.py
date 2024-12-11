@@ -28,6 +28,11 @@ class Score(models.Model):
         max_value=100.0,
         verbose_name='Баллы',
     )
+    experiment = models.ForeignKey(
+        'competitions.Experiment',
+        on_delete=models.CASCADE,
+        verbose_name='Задание',
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата создания',

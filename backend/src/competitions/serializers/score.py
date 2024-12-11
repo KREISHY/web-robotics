@@ -1,41 +1,69 @@
 from rest_framework import serializers
-from competitions.models import Score
-from competitions.models import Competition, Criteria
+from competitions.models import Score, Competition, Criteria, Experiment
 from users.models import User
-from competitions.models import Teams  # Импортируем модель Teams
-from competitions.serializers import CriteriaSerializer
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели User (если требуется информация о пользователе)."""
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
-
-
-class CompetitionSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Competition."""
-    class Meta:
-        model = Competition
-        fields = ['name', 'description', 'created_at', ]
-
-
-class TeamSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Teams."""
-    class Meta:
-        model = Teams
-        fields = ['name', 'robot_name', 'city', 'institution', 'status']
 
 
 class ScoreSerializer(serializers.ModelSerializer):
-    competition = CompetitionSerializer()  # Вложенный сериализатор для соревнования
-    judge_user = UserSerializer()  # Вложенный сериализатор для судьи
-    criteria = CriteriaSerializer()  # Вложенный сериализатор для критерия
-    team = TeamSerializer(source='competition.teams.team', many=False)  # Связь с командой через соревнование
-    score = serializers.FloatField()  # Представляем баллы как число с плавающей точкой
-    created_at = serializers.DateTimeField()  # Время создания
-    updated_at = serializers.DateTimeField()  # Время последнего обновления
+    competition_name = serializers.CharField(source='competition.name', read_only=True)
+    criteria_name = serializers.CharField(source='criteria.name', read_only=True)
+    judge_name = serializers.CharField(source='judge_user.username', read_only=True)
+    experiment_name = serializers.CharField(source='experiment.name', read_only=True)
+
+    competition = serializers.PrimaryKeyRelatedField(queryset=Competition.objects.all(), write_only=True)
+    judge_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
+    criteria = serializers.PrimaryKeyRelatedField(queryset=Criteria.objects.all(), write_only=True)
+    experiment = serializers.PrimaryKeyRelatedField(queryset=Experiment.objects.all(), write_only=True)
 
     class Meta:
         model = Score
-        fields = ['competition', 'judge_user', 'criteria', 'team', 'score', 'created_at', 'updated_at']
+        fields = [
+            'id', 'competition', 'competition_name',
+            'judge_user', 'judge_name',
+            'criteria', 'criteria_name',
+            'experiment', 'experiment_name',
+            'score', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'competition_name', 'judge_name', 'criteria_name', 'experiment_name', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'score': {
+                'required': True,
+                'error_messages': {
+                    'required': 'Поле "баллы" обязательно для заполнения.',
+                    'invalid': 'Баллы должны быть числом от 0 до 100.',
+                }
+            }
+        }
+
+    def validate_score(self, value):
+        """
+        Валидация поля score (например, проверка диапазона).
+        """
+        if not (0.0 <= value <= 100.0):
+            raise serializers.ValidationError('Баллы должны быть в диапазоне от 0 до 100.')
+        return value
+
+    def validate(self, data):
+        """
+        Общая валидация, например, проверка уникальности судьи, критерия и эксперимента в рамках соревнования.
+        """
+        competition = data.get('competition')
+        judge_user = data.get('judge_user')
+        criteria = data.get('criteria')
+        experiment = data.get('experiment')
+
+        if Score.objects.filter(
+            competition=competition,
+            judge_user=judge_user,
+            criteria=criteria,
+            experiment=experiment
+        ).exists():
+            raise serializers.ValidationError(
+                'Судья уже оценил это испытание по данному критерию в рамках соревнования.'
+            )
+        return data
+
+    def create(self, validated_data):
+        """
+        Создание объекта Score с поддержкой обработанных полей.
+        """
+        return Score.objects.create(**validated_data)
