@@ -35,8 +35,8 @@ class UserManager(BaseUserManager):
         """
         Create and save a User with the given email and password.
         """
-        if not email:
-            raise ValueError('The mail id must be set')
+        # if not email:
+        #     raise ValueError('The mail id must be set')
         if not password:
             raise ValueError('The password must be set')
 
@@ -64,9 +64,8 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         verbose_name='Имя пользователя',
-        blank=True,
-        null=True,
         max_length=128,
+        unique=True,
     )
     password = models.CharField(
         verbose_name='Пароль',
@@ -75,10 +74,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             'required': 'Пожалуйста, заполните поле пароля.',
         }
     )
-
     email = models.EmailField(
         verbose_name='Почта',
         unique=True,
+        blank=True,
         error_messages={
             'required': 'Пожалуйста, заполните поле почты.',
         }
@@ -130,6 +129,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns the short name for the user.
         """
         return self.first_name
+
+    def is_judge(self) -> bool:
+        return bool(self.groups.filter(name='Operators').exists())
+
+    def is_operator(self) -> bool:
+        return bool(self.groups.filter(name='Operators').exists())
 
 class EmailVerify(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_verifications')

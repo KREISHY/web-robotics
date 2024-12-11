@@ -6,6 +6,9 @@ from users.models import User, EmailVerify, PasswordReset
 
 # Валидаторы
 def custom_validate_email(email):
+    if User.objects.filter(email=email).exists():
+        raise serializers.ValidationError({'email': 'Эта почта уже используется.'})
+
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         raise serializers.ValidationError({'email': 'Введите корректный адрес электронной почты.'})
 
@@ -34,13 +37,20 @@ def custom_validate_patronymic(patronymic):
         raise serializers.ValidationError({'patronymic': 'Отчество должно содержать только буквы.'})
     return patronymic
 
+def custom_validate_username(username):
+    # Проверка, что username содержит только допустимые символы
+    if not re.match(r"^[a-zA-Z0-9_]+$", username):
+        raise serializers.ValidationError({'username': 'Имя пользователя может содержать только буквы, цифры и символы "_".'})
+
+    # Проверка уникальности username
+    if User.objects.filter(username=username).exists():
+        raise serializers.ValidationError({'username': 'Это имя пользователя уже занято. Пожалуйста, выберите другое.'})
+
 # Валидация регистрации
 def custom_validate_register(data):
     email = data.get('email')
     if not email:
         raise serializers.ValidationError({'email': 'Пожалуйста, введите вашу почту.'})
-    if User.objects.filter(email=email).exists():
-        raise serializers.ValidationError({'email': 'Эта почта уже используется.'})
     custom_validate_email(email)
 
     password = data.get('password')
@@ -136,20 +146,9 @@ def custom_validate_reset_verify_password(data, url):
 
     custom_validate_password(password)
 
-
-
-def custom_validate_user_login(data):
-    custom_validate_email_login(data)
-    custom_validate_password_login(data)
-
-def custom_validate_email_login(data):
-    email = data.get('email')
-    if not email:
-        raise serializers.ValidationError({"email": "Пожалуйста, введите вашу почту."})
-
-    user = User.objects.filter(email=email).first()
-    if not user:
-        raise serializers.ValidationError({"email": "Пользователь с такой почтой не найден."})
+def custom_validate_username_login(username):
+    if not User.objects.filter(username=username).exists():
+        raise serializers.ValidationError({'username': 'Данное имя пользователя не существует.'})
 
 def custom_validate_password_login(data):
     password = data.get('password')
@@ -161,3 +160,42 @@ def custom_validate_password_login(data):
     user = User.objects.filter(email=email).first()
     if user and not check_password(password, user.password):
         raise serializers.ValidationError({"password": "Неверный пароль."})
+
+def custom_validate_user_login(data):
+    custom_validate_password_login(data)
+
+    if data.get('email'):
+        custom_validate_email_login(data)
+
+    if data.get('username'):
+        custom_validate_username_login(data.get('username'))
+
+def custom_validate_email_login(data):
+    email = data.get('email')
+    if not email:
+        raise serializers.ValidationError({"email": "Пожалуйста, введите вашу почту."})
+
+    user = User.objects.filter(email=email).first()
+    if not user:
+        raise serializers.ValidationError({"email": "Пользователь с такой почтой не найден."})
+
+
+def validate_judge_register(data):
+    email = data.get('email')
+    password = data.get('password')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    patronymic = data.get('patronymic')
+
+    if email:
+        custom_validate_email(email)
+
+    if password:
+        custom_validate_password(password)
+
+    custom_validate_first_name(first_name)
+    custom_validate_last_name(last_name)
+
+    if patronymic:
+        custom_validate_patronymic(patronymic)
+

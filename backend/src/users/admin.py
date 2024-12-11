@@ -7,13 +7,13 @@ from users.models import User, EmailVerify, PasswordReset
 
 @admin.register(User)
 class CustomUser(UserAdmin):
-    list_display = ('email','first_name', 'last_name', 'patronymic', 'is_active','email_confirmed',)
+    list_display = ('email' , 'username', 'first_name', 'last_name', 'patronymic', 'is_active','email_confirmed',)
     fieldsets = (
-        (None, {'fields': ('email',  'password')}),
+        (None, {'fields': ('email', 'username',  'password')}),
         ('Personal info', {'fields': ('last_name', 'first_name', 'patronymic')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
     )
-    readonly_fields = ('last_login', 'date_joined', 'username', 'email_confirmed',)
+    readonly_fields = ('last_login', 'date_joined',  'email_confirmed',)
 
 @admin.register(EmailVerify)
 class Token(ModelAdmin):

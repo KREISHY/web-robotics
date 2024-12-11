@@ -7,6 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 # Инициализация приложений Django
 django.setup()
 
+from django.contrib.auth.models import Group
 from users.models import User
 from config import SUPERUSER_EMAIL, SUPERUSER_PASSWORD
 
@@ -25,3 +26,21 @@ try:
         print(f"Суперпользователь уже существует.")
 except Exception as e:
     print(f"Ошибка при создании суперпользователя: {e}")
+
+try:
+    # Проверка и создание группы "Administrator"
+    admin_group, created = Group.objects.get_or_create(name='Operators')
+    if created:
+        print("Группа 'Operators' была создана.")
+    else:
+        print("Группа 'Operators' уже существует.")
+
+    # Проверка и создание группы "Judges"
+    judges_group, created = Group.objects.get_or_create(name='Judges')
+    if created:
+        print("Группа 'Judges' была создана.")
+    else:
+        print("Группа 'Judges' уже существует.")
+
+except Exception as e:
+    print(f"Ошибка при создании групп: {e}")
