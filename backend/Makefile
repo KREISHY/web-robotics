@@ -15,7 +15,7 @@ clean-up:
 	docker volume rm $(docker volume ls -qf dangling=true)
 
 migrate:
-	venv/bin/python3 src/manage.py makemigrations users
+	venv/bin/python3 src/manage.py makemigrations users competitions
 	venv/bin/python3 src/manage.py migrate
 
 entry-point:

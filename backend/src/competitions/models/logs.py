@@ -18,3 +18,7 @@ class Log(models.Model):
         auto_now=True,
         verbose_name='Дата и время изменения'
     )
+
+    class Meta:
+        verbose_name = "Лог"
+        verbose_name_plural = "Логи"

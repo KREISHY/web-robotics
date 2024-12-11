@@ -11,3 +11,7 @@ class Criteria(models.Model):
         min_value=0, max_value=5,
         verbose_name='Вес критерия',
     )
+
+    class Meta:
+        verbose_name = "Критерий"
+        verbose_name_plural = "Критерии"
