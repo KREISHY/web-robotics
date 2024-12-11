@@ -19,7 +19,7 @@ function NavbarMain() {
     return (
         <>
             {[false].map((expand) => (
-                <Navbar key={expand} expand={expand} className="bg-primary navbar-dark mb-3">
+                <Navbar key={expand} expand={expand} className="bg-primary navbar-dark mb-3" >
                     <Container fluid>
                         <Navbar.Brand href="#">
                             <Image src="/logo.png" style={{ width: '300px', height: '90px' }} />
@@ -52,9 +52,9 @@ function NavbarMain() {
                             </Offcanvas.Header>
                             <Offcanvas.Body>
                                 <Nav className="justify-content-end flex-grow-1 pe-3">
-                                    <NavLink to='/'>Домой</NavLink>
-                                    <NavLink to='/login'>Вход</NavLink>
-                                    <NavLink to='/contacts'>Контакты</NavLink>
+                                    <NavLink to='/' style={{ fontSize: '36px' }}>Домой</NavLink>
+                                    <NavLink to='/login' style={{ fontSize: '36px' }}>Вход</NavLink>
+                                    <NavLink to='/contacts' style={{ fontSize: '36px' }}>Контакты</NavLink>
                                 </Nav>
                             </Offcanvas.Body>
                         </Navbar.Offcanvas>
