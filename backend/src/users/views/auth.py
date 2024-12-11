@@ -14,6 +14,7 @@ class CurrentUserViewSet(viewsets.ViewSet):
     Если пользователь не авторизирован указывает пустые поля
     """
     serializer_class = UserCurrentSerializer
+    http_method_names = ['get', 'post' ,'head', 'options', 'list']
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
@@ -31,6 +32,7 @@ class LoginByEmailViewSet(ModelViewSet):
     queryset = User.objects.none
     serializer_class = UserLoginByEmailSerializer
     permission_classes = [permissions.AllowAny]
+    http_method_names = ['get', 'post' ,'head', 'options', 'list']
 
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -71,6 +73,7 @@ class LoginByUsernameViewSet(ModelViewSet):
     queryset = User.objects.none
     serializer_class = UserLoginByUsernameSerializer
     permission_classes = [permissions.AllowAny]
+    http_method_names = ['get', 'post' ,'head', 'options', 'list']
 
     def list(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -115,6 +118,7 @@ class UserLogoutViewSet(viewsets.ViewSet):
     Выход из системы
     """
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post' ,'head', 'options', 'list']
 
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)

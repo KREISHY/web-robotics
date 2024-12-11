@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Competition, Criteria, Log, Score, Teams, TeamMembers
+from .models import Competition, Criteria, Log, Score, Teams
 
 
 @admin.register(Competition)
@@ -40,16 +40,8 @@ class ScoreAdmin(admin.ModelAdmin):
 @admin.register(Teams)
 class TeamsAdmin(admin.ModelAdmin):
     list_display = ('name', 'city', 'institution', 'leader', 'status')
-    list_filter = ('city', 'status', 'leader__username')
-    search_fields = ('name', 'city', 'institution', 'leader__username')
+    list_filter = ('city', 'status', 'leader')
+    search_fields = ('name', 'city', 'institution', 'leader')
     list_editable = ('status',)
     list_per_page = 20
     ordering = ('name',)  # Сортировка по алфавиту
-
-
-@admin.register(TeamMembers)
-class TeamMembersAdmin(admin.ModelAdmin):
-    list_display = ('user', 'team')
-    list_filter = ('team__name', 'user__username')
-    search_fields = ('user__username', 'team__name')
-    ordering = ('team__name', 'user__username')  # Сортировка по имени команды и пользователя
