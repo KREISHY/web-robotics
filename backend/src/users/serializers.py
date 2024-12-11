@@ -1,3 +1,6 @@
+import uuid
+
+from django.contrib.auth.models import Group
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -5,22 +8,41 @@ from rest_framework.serializers import ModelSerializer
 
 from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_PASSWORD_RESET_VERIFY
 from users.models import User, EmailVerify, PasswordReset
+from users.utils import generate_random_password, generate_uuid
 from users.validations import custom_validate_register, custom_validate_token, custom_validate_reset_request_password, \
-    custom_validate_reset_verify_password, custom_validate_user_login
+    custom_validate_reset_verify_password, custom_validate_user_login, validate_judge_register
 
 
 class UserCurrentSerializer(serializers.ModelSerializer):
+    groups = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['email', 'last_name', 'first_name', 'patronymic']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'groups']
+
+    def get_groups(self, obj):
+        group_names = list(obj.groups.values_list("name", flat=True))
+        if obj.is_superuser:
+            group_names.append("superuser")
+        return group_names
+
+
 
 
 class UserRegistrationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'password', 'last_name', 'first_name', 'patronymic', 'password']
+        fields = ['email', 'username', 'password', 'last_name', 'first_name', 'patronymic', 'password']
         extra_kwargs = {
+            "username": {
+                "error_messages": {
+                    'blank': 'Пожалуйста, укажите имя пользователя.',
+                    'required': 'Пожалуйста, укажите имя пользователя.',
+                }
+            },
+
             "email": {
+                "required": True,
                 "error_messages": {
                     "required": "Укажите ваш email.",
                     "blank": "Пожалуйста, напишите вашу почты.",
@@ -56,6 +78,7 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         custom_validate_register(data)
         return data
 
+
 class EmailTokenCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailVerify
@@ -82,12 +105,14 @@ class EmailTokenCreationSerializer(serializers.ModelSerializer):
         custom_validate_token(data, url)
         return data
 
+
 class PasswordResetRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = PasswordReset
         fields = ['email']
         extra_kwargs = {
             "email": {
+                'required': True,
                 "error_messages": {
                     "required": "Пожалуйста, напишите вашу почту.",
                     "blank": "Пожалуйста, напишите вашу почту.",
@@ -95,7 +120,6 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
                 }
             },
         }
-
 
     def create(self, validated_data):
         PasswordReset.objects.filter(email=validated_data['email']).delete()
@@ -110,6 +134,7 @@ class PasswordResetRequestSerializer(serializers.ModelSerializer):
     def validate(self, data):
         custom_validate_reset_request_password(data)
         return data
+
 
 class PasswordResetVerifySerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, error_messages={
@@ -140,7 +165,7 @@ class PasswordResetVerifySerializer(serializers.ModelSerializer):
         return user
 
 
-class UserLoginSerializer(ModelSerializer):
+class UserLoginByEmailSerializer(ModelSerializer):
     email = serializers.EmailField(required=True, error_messages={
         "required": "Пожалуйста, напишите вашу почту.",
         "blank": "Пожалуйста, напишите вашу почту.",
@@ -152,10 +177,31 @@ class UserLoginSerializer(ModelSerializer):
         "blank": "Пожалуйста, напишите ваш пароль.",
     })
 
-
     class Meta:
         model = User
         fields = ['email', 'password']
+
+    def validate(self, data):
+        custom_validate_user_login(data)
+        return data
+
+
+
+class UserLoginByUsernameSerializer(ModelSerializer):
+    username = serializers.CharField(required=True, error_messages={
+        "required": "Пожалуйста, напишите имя пользователя.",
+        "blank": "Пожалуйста, напишите имя пользователя.",
+    })
+
+    password = serializers.CharField(write_only=True, required=True, error_messages={
+        "required": "Пожалуйста, напишите ваш пароль.",
+        "blank": "Пожалуйста, напишите ваш пароль.",
+    })
+
+
+    class Meta:
+        model = User
+        fields = ['username', 'password']
 
 
     def validate(self, data):
@@ -163,3 +209,67 @@ class UserLoginSerializer(ModelSerializer):
         return data
 
 
+
+class JudgeRegisterSerializer(ModelSerializer):
+    password = serializers.CharField(
+        max_length=128,
+        allow_blank=True,
+        required=False,
+        error_messages={
+            'required': 'Пожалуйста, заполните поле пароля.',
+        }
+    )
+    email = serializers.EmailField(
+        allow_blank=True,
+        required=False,
+        error_messages={
+            "invalid": "Пожалуйста, введите корректный адрес почты.",
+        }
+    )
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'last_name', 'first_name', 'patronymic', 'password']
+        extra_kwargs = {
+            "username": {
+                "error_messages": {
+                    'blank': 'Пожалуйста, укажите имя пользователя.',
+                    'required': 'Пожалуйста, укажите имя пользователя.',
+                }
+            },
+
+            "last_name": {
+                "error_messages": {"required": "Введите фамилию.", "blank": "Пожалуйста, напишите вашу фамилию."}},
+            "first_name": {
+                "error_messages": {"required": "Введите имя.", "blank": "Пожалуйста, напишите ваше имя."}},
+        }
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        email = validated_data.pop('email', None)
+
+        if not password:
+            password = generate_random_password()  # Генерация пароля, если не передан
+
+        if not email:
+            email = uuid.uuid4().hex[:12] + '@' + 'judge' + '.ru'
+
+        user = User.objects.create_user(
+            email=email,
+            username=validated_data['username'],
+            password=password,
+            last_name=validated_data.get('last_name', ''),
+            first_name=validated_data.get('first_name', ''),
+            patronymic=validated_data.get('patronymic', ''),
+            is_active=True,
+            email_confirmed=True,
+        )
+
+        group, created = Group.objects.get_or_create(name="Judges")
+        user.groups.add(group)
+
+        return user, {"password": password}
+
+    def validate(self, data):
+        validate_judge_register(data)
+        return data

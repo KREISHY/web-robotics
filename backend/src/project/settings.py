@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'admin_panel',
+    'competitions',
 ]
 
 MIDDLEWARE = [
@@ -150,7 +151,6 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [

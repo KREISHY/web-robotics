@@ -1,5 +1,6 @@
 SUPERUSER_EMAIL = 'admin@admin.ru'
 SUPERUSER_PASSWORD = 'admin123!'
+SUPERUSER_USERNAME = 'admin'
 ROOT_URL = 'http://localhost:8000/'
 URL_USERS_API = 'api/users/'
 URL_EMAIL_VERIFY = 'email-verify/'
