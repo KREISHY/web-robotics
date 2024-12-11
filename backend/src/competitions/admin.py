@@ -4,9 +4,9 @@ from .models import Competition, Criteria, Log, Score, Teams, TeamMembers
 
 @admin.register(Competition)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'team', 'created_at', 'updated_at')
-    list_filter = ('team__name', 'created_at')
-    search_fields = ('name', 'team__name')
+    list_display = ('name', 'created_at', 'updated_at')
+    list_filter = ('created_at', )
+    search_fields = ('name', )
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)  # Сортировка по дате добавления (от новых к старым)
 
