@@ -1,4 +1,6 @@
 from django.db import models
+
+from users.models import User
 from .teams import Teams
 from django.utils.timezone import now
 
@@ -34,4 +36,18 @@ class Competition(models.Model):
 
     def registrations_is_running(self):# Текущее время
         return self.start_registration <= now() <= self.end_registration
+
+
+class CompetitionJudges(models.Model):
+    judge = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+
+    competition = models.ForeignKey(
+        Competition,
+        on_delete=models.CASCADE,
+    )
+
+
 
