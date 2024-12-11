@@ -4,12 +4,13 @@ from competitions.models import Criteria, Competition
 
 class CriteriaSerializer(serializers.ModelSerializer):
     competition_name = serializers.CharField(source='competitions.name', read_only=True)
+    competition_id = serializers.CharField(source='competitions.id', read_only=True)
     competition = serializers.PrimaryKeyRelatedField(queryset=Competition.objects.all(), write_only=True)
 
     class Meta:
         model = Criteria
-        fields = ['id', 'name', 'weight', 'competition', 'competition_name']
-        read_only_fields = ['id', 'competition_name']
+        fields = ['id', 'name', 'weight', 'competition', 'competition_name', 'competition_id']
+        read_only_fields = ['id', 'competition_name', 'competition_id']
         extra_kwargs = {
             'name': {
                 'required': True,
