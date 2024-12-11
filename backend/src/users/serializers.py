@@ -274,3 +274,68 @@ class JudgeRegisterSerializer(ModelSerializer):
     def validate(self, data):
         validate_judge_register(data)
         return data
+
+
+class OperatorRegisterSerializer(ModelSerializer):
+    password = serializers.CharField(
+        max_length=128,
+        allow_blank=True,
+        required=False,
+        error_messages={
+            'required': 'Пожалуйста, заполните поле пароля.',
+        }
+    )
+    email = serializers.EmailField(
+        allow_blank=True,
+        required=False,
+        error_messages={
+            "invalid": "Пожалуйста, введите корректный адрес почты.",
+        }
+    )
+
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'password', 'last_name', 'first_name', 'patronymic', 'password']
+        extra_kwargs = {
+            "username": {
+                "error_messages": {
+                    'blank': 'Пожалуйста, укажите имя пользователя.',
+                    'required': 'Пожалуйста, укажите имя пользователя.',
+                }
+            },
+
+            "last_name": {
+                "error_messages": {"required": "Введите фамилию.", "blank": "Пожалуйста, напишите вашу фамилию."}},
+            "first_name": {
+                "error_messages": {"required": "Введите имя.", "blank": "Пожалуйста, напишите ваше имя."}},
+        }
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        email = validated_data.pop('email', None)
+
+        if not password:
+            password = generate_random_password()  # Генерация пароля, если не передан
+
+        if not email:
+            email = uuid.uuid4().hex[:12] + '@' + 'operator' + '.ru'
+
+        user = User.objects.create_user(
+            email=email,
+            username=validated_data['username'],
+            password=password,
+            last_name=validated_data.get('last_name', ''),
+            first_name=validated_data.get('first_name', ''),
+            patronymic=validated_data.get('patronymic', ''),
+            is_active=True,
+            email_confirmed=True,
+        )
+
+        group, created = Group.objects.get_or_create(name="Operators")
+        user.groups.add(group)
+
+        return user, {"password": password}
+
+    def validate(self, data):
+        validate_judge_register(data)
+        return data
