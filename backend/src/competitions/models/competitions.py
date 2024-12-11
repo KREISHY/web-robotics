@@ -17,9 +17,11 @@ class Competition(models.Model):
         auto_now_add=True,
         verbose_name="Дата добавления",
     )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name="Дата обновления"
+    start_registration = models.DateTimeField(
+        verbose_name='Дата и время начала регистрации',
+    )
+    end_registration = models.DateTimeField(
+        verbose_name='Дата и время конца регистрации',
     )
 
     def __str__(self):

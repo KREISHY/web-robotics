@@ -16,7 +16,7 @@ class CompetitionSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Competition."""
     class Meta:
         model = Competition
-        fields = ['name', 'description', 'created_at', 'updated_at']
+        fields = ['name', 'description', 'created_at', ]
 
 
 class CriteriaSerializer(serializers.ModelSerializer):
