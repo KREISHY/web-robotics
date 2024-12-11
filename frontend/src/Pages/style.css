@@ -1,0 +1,74 @@
+.container {
+    background-color: rgba(255, 255, 255, 0.8); /* Белый фон с прозрачностью */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-item-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Задайте нужную высоту для карусели */
+}
+
+.carousel-image {
+    max-width: 100%; /* Уменьшить ширину изображения */
+    max-height: 100%; /* Убедитесь, что изображение не превышает высоту контейнера */
+    object-fit: contain; /* Поддерживать пропорции изображения */
+}
+
+.mainText{
+    font-size: 32px;
+    font-family:'Circe';
+}
+
+.main-container {
+    margin-top: 40px;
+}
+
+.main-logo {
+    max-width: 100%;
+    height: auto;
+}
+
+.main-text {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    text-align: justify;
+    margin: 0 10px;
+}
+
+.carousel-wrapper {
+    margin-top: 40px;
+}
+
+.carousel-item-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-image {
+    max-width: 70%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+/* Анимация наклонов и приближения */
+@keyframes tiltAnimation {
+    0% {
+        transform: rotate(0deg) scale(1); /* Начальное состояние */
+    }
+    50% {
+        transform: rotate(20deg) scale(1.1); /* Приближение и наклон */
+    }
+    100% {
+        transform: rotate(0deg) scale(1); /* Возврат в исходное состояние */
+    }
+}
+
+/* Применение анимации */
+.animated-logo {
+    animation: tiltAnimation 10s infinite; /* Длительность 5 секунд, бесконечный цикл */
+}

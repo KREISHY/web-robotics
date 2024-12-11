@@ -1,53 +1,59 @@
 import './style.css';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import Carousel from 'react-bootstrap/Carousel';
-import { useNavigate } from 'react-router-dom';
+import { Container, Carousel, Row, Col } from 'react-bootstrap';
+import {Heading, Text} from "@chakra-ui/react";
+import Image from "react-bootstrap/Image";
 
 function Home() {
-  const navigate =useNavigate();
-  return (
-    <>
-      <Container>
-          <Carousel data-bs-theme="dark">
-              <Carousel.Item>
-                  <img
-                      className="d-block w-100"
-                      src="/1.js/800x400?text=First slide&bg=f5f5f5"
-                      alt="First slide"
-                  />
-                  <Carousel.Caption>
-                      <h5>First slide label</h5>
-                      <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                  </Carousel.Caption>
-              </Carousel.Item>
-              <Carousel.Item>
-                  <img
-                      className="d-block w-100"
-                      src="holder.js/800x400?text=Second slide&bg=eee"
-                      alt="Second slide"
-                  />
-                  <Carousel.Caption>
-                      <h5>Second slide label</h5>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                  </Carousel.Caption>
-              </Carousel.Item>
-              <Carousel.Item>
-                  <img
-                      className="d-block w-100"
-                      src="holder.js/800x400?text=Third slide&bg=e5e5e5"
-                      alt="Third slide"
-                  />
-                  <Carousel.Caption>
-                      <h5>Third slide label</h5>
-                      <p>
-                          Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-                      </p>
-                  </Carousel.Caption>
-              </Carousel.Item>
-          </Carousel>
-      </Container>
-    </>
-  );
+    return (
+        <>
+            <Container className="main-container">
+                <Row className="align-items-center">
+                    <Col md={4} className="text-center">
+                        <Image src="лого7.png" className="main-logo animated-logo" />
+                    </Col>
+                    <Col md={8}>
+                        <Heading className="head">
+                            ID-CUBE.СОРЕВНОВАНИЯ
+                        </Heading>
+                        <Text className="mainText">
+                            Мы — команда, объединяющая студентов, преподавателей и энтузиастов в
+                            области робототехники. Нашей целью является развитие инноваций, практических
+                            навыков и инженерного мышления через изучение передовых технологий и создание уникальных проектов.
+                        </Text>
+                    </Col>
+                </Row>
+                <Carousel data-bs-theme="dark" className="carousel-wrapper">
+                    <Carousel.Item>
+                        <div className="carousel-item-wrapper">
+                            <img
+                                className="carousel-image"
+                                src="/1.jpg"
+                                alt="First slide"
+                            />
+                        </div>
+                    </Carousel.Item>
+                    <Carousel.Item>
+                        <div className="carousel-item-wrapper">
+                            <img
+                                className="carousel-image"
+                                src="/2.jpg"
+                                alt="Second slide"
+                            />
+                        </div>
+                    </Carousel.Item>
+                    <Carousel.Item>
+                        <div className="carousel-item-wrapper">
+                            <img
+                                className="carousel-image"
+                                src="/3.jpg"
+                                alt="Third slide"
+                            />
+                        </div>
+                    </Carousel.Item>
+                </Carousel>
+            </Container>
+        </>
+    );
 }
 
 export default Home;

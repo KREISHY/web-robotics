@@ -1,5 +1,14 @@
 body {
   font-family: "Circe", "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('./../public/bg.png') repeat;
+  background-size: auto;
+}
+
+.head {
+  font-family: "Circe-EXtrabold", sans-serif;
+  font-weight: 800; /* Extra-Bold */
 }
 
 
