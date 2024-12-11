@@ -97,16 +97,24 @@ class LoginByUsernameViewSet(ModelViewSet):
             username = serializer.validated_data.get('username')
             password = serializer.validated_data.get('password')
 
-            email = User.objects.get(username=username).email
+            try:
+                email = User.objects.get(username=username).email
+            except User.DoesNotExist:
+                raise serializers.ValidationError({'username': 'Пользователь с таким именем не найден.'})
 
             if not email:
-                raise serializers.ValidationError({'username': 'Ошибка, у пользователя отсутствует почта.'
+                raise serializers.ValidationError({'username': 'Ошибка, у пользователя отсутствует почта. '
                                                                'Обратитесь в техническую поддержку.'})
 
             user = authenticate(request, email=email, password=password)
             if user:
+                # Проверка ролей пользователя
+                if not (user.is_superuser or user.is_judge() or user.is_operator or user.is_staff):
+                    raise serializers.ValidationError({'username': 'Вход запрещён. У вас нет прав доступа.'})
+
                 login(request, user)
                 return Response(status=status.HTTP_200_OK)
+
             return Response({'status': 'error', 'message': 'Предоставлены неверные данные'},
                             status=status.HTTP_401_UNAUTHORIZED)
 

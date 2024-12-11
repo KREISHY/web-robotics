@@ -1,8 +1,12 @@
+from os.path import basename
+
 from rest_framework import routers
 
 from config import URL_EMAIL_VERIFY, URL_PASSWORD_RESET_VERIFY
 from users.views.auth import CurrentUserViewSet, LoginByEmailViewSet, LoginByUsernameViewSet, UserLogoutViewSet
 from users.views.judge_register import JudgeRegisterViewSet
+from users.views.judges import JudgeViewSet
+from users.views.operator_register import OperatorViewSet
 from users.views.registration import UserRegistrationView
 from users.views.email_confirm_token import EmailTokenConfirmationView
 from users.views.reset import ResetPasswordRequestView, ResetPasswordConfirmationView
@@ -21,7 +25,9 @@ router.register(email_verify_url, EmailTokenConfirmationView, basename=email_ver
 router.register(r'password-reset-create', ResetPasswordRequestView, basename='password-reset-create')
 router.register(password_reset_confirm_url, ResetPasswordConfirmationView, basename=password_reset_confirm_url)
 router.register(r'judge-register', JudgeRegisterViewSet, basename='judge-register')
-
+router.register(r'operator-register', OperatorViewSet, basename='operator-register')
+router.register(r'judges', JudgeViewSet, basename='judges')
+router.register(r'operators', OperatorViewSet, basename='operators')
 
 
 urlpatterns = [
