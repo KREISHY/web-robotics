@@ -72,3 +72,21 @@
 .animated-logo {
     animation: tiltAnimation 10s infinite; /* Длительность 5 секунд, бесконечный цикл */
 }
+
+/* Начальное состояние: элементы скрыты */
+.hidden {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Конечное состояние: элементы видны */
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Применение анимации к элементам */
+.main-container, .carousel-wrapper, .main-logo, .mainText, .head {
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}

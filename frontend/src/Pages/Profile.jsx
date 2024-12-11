@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Card, Nav, Form, Button } from "react-bootstrap";
 import axiosConfig from "./Components/AxiosConfig"; // Ваш axiosConfig для отправки данных
+import { useNavigate } from 'react-router-dom'; // Для перенаправления пользователя
 
 function LoginPage() {
     const [role, setRole] = useState("user");
-
-    // Инициализация состояния для данных пользователя
     const [user, setUser] = useState({
         email: "",
         username: "",
@@ -14,8 +13,9 @@ function LoginPage() {
         first_name: "",
         patronymic: ""
     });
+    const [error, setError] = useState(""); // Стейт для хранения ошибок
+    const navigate = useNavigate(); // Для редиректа после успешной аутентификации
 
-    // Обработчик для изменения данных пользователя
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUser({
@@ -24,29 +24,23 @@ function LoginPage() {
         });
     };
 
-    // Функция для обработки выбора роли
     const handleSelectRole = (rol) => {
         setRole(rol);
     };
 
-    // Функция для отправки данных на сервер
     const handleSubmit = async () => {
-        // Создаем объект данных для отправки на сервер в зависимости от роли
         let payload = {};
         if (role === "user") {
-            // Для роли "user" отправляем только email и password
             payload = {
                 email: user.email,
                 password: user.password
             };
         } else if (role === "referi") {
-            // Для роли "referi" отправляем только username и password
             payload = {
                 username: user.username,
                 password: user.password
             };
         } else if (role === "registerUser") {
-            // Для регистрации отправляем все данные
             payload = {
                 email: user.email,
                 username: user.username,
@@ -58,10 +52,24 @@ function LoginPage() {
         }
 
         try {
-            const response = await axiosConfig.post('/users/register/', payload);
-            console.log('Response:', response);
+            let response;
+            if (role === "registerUser") {
+                response = await axiosConfig.post('/users/register/', payload);
+                console.log('User registered:', response);
+                // После регистрации можно перенаправить на страницу входа
+                navigate("/login"); // Например, редирект на страницу логина
+            } else {
+                const endpoint = role === "user" ? '/users/login-email/' : '/users/login-username/';
+                response = await axiosConfig.post(endpoint, payload);
+                console.log('User logged in:', response);
+                // Сохраняем токен или данные пользователя в localStorage, sessionStorage или в стейт
+                localStorage.setItem('authToken', response.data.token); // Пример, если сервер отдает токен
+                // Перенаправляем пользователя на страницу после успешного входа
+                navigate("/dashboard"); // Редирект на страницу с контентом
+            }
         } catch (error) {
             console.error('Error:', error);
+            setError('Ошибка аутентификации. Пожалуйста, проверьте свои данные.');
         }
     };
 
@@ -81,6 +89,8 @@ function LoginPage() {
                     </Card.Header>
                     <Card.Body>
                         <Card.Title>{role === "registerUser" ? "Регистрация" : "Вход"}</Card.Title>
+
+                        {error && <div className="text-danger">{error}</div>} {/* Выводим ошибку, если она есть */}
 
                         {/* Форма для роли "user" */}
                         {role === "user" ? (

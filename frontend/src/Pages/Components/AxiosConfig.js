@@ -3,6 +3,7 @@ import axios from "axios";
 const BASE_URL = "http://127.0.0.1:8000/api/";
 const getCSRFToken = () => {
     const cookieValue = document.cookie
+
       .split('; ')
       .find(row => row.startsWith('csrftoken'))
       ?.split('=')[1];
