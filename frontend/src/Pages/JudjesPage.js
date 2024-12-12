@@ -4,7 +4,7 @@ import Image from "react-bootstrap/Image";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Nav from "react-bootstrap/Nav";
 import React, { useState } from "react";
-import TableTests from "./TableTests";
+import TableTeams from "./Components/TableTeams";
 import TableJudjes from "./Components/TableJudjes";
 
 const JudjesPage = () => {
@@ -13,12 +13,13 @@ const JudjesPage = () => {
     const [selectedCompetition, setSelectedCompetition] = useState(null); // Состояние для выбранного соревнования
 
     const renderTable = () => {
+        console.log(selectedCompetition?.id);
         // Возвращаем нужный компонент на основе состояния
         switch (activeTable) {
             case "comp":
                 return <TableJudjes setSelectedCompetition={setSelectedCompetition} />;
-            case "tests":
-                return <TableTests competition={selectedCompetition} />;
+            case "teams":
+                return <TableTeams selectedCompetition={selectedCompetition.id} />;
             default:
                 return null;
         }
@@ -56,9 +57,9 @@ const JudjesPage = () => {
                                     <>
                                         <Nav.Link
                                             style={{ fontSize: '24px', padding: '10px 0', cursor: 'pointer' }}
-                                            onClick={() => setActiveTable("tests")}
+                                            onClick={() => setActiveTable("teams")}
                                         >
-                                            Список испытаний
+                                            Список команд
                                         </Nav.Link>
                                         <Nav.Link
                                             style={{ fontSize: '24px', padding: '10px 0', cursor: 'pointer' }}
@@ -83,7 +84,6 @@ const JudjesPage = () => {
 
             {/* Отображение выбранной таблицы */}
             <Container>
-                {renderTable()}
                 {selectedCompetition? (
                     <div>
                         <h3>Выбрано</h3>
@@ -95,6 +95,8 @@ const JudjesPage = () => {
 
                 ) : (null)
                 }
+                {renderTable()}
+
             </Container>
         </>
     );
