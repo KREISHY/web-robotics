@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table } from "react-bootstrap";
 import axiosConfig from "./AxiosConfig";
-import {NavLink, useParams} from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 // Функция для преобразования даты в читаемый формат
 const formatDate = (dateString) => {
@@ -46,7 +46,7 @@ const TableForUsers = () => {
         // Получение баллов по каждой команде
         const fetchScores = async () => {
             try {
-                const response = await axiosConfig.get("/v0/scores/");
+                const response = await axiosConfig.get(`/v0/score/?competition_id=${competitionId}`);
                 setScores(response.data);
             } catch (error) {
                 console.error("Ошибка при получении данных баллов:", error);
@@ -88,18 +88,23 @@ const TableForUsers = () => {
                 <tbody>
                 {sortedTeams.length > 0 ? (
                     sortedTeams.map((team, index) => {
+                        // Массив баллов для каждой команды и каждого критерия
                         const teamScores = criterias.map(criteria => {
-                            const score = scores.find(score => score.team_id === team.id && score.criteria_id === criteria.id);
-                            return score ? score.score : 0; // Используем score вместо value
+                            // Ищем балл для этой команды и критерия
+                            const score = scores.find(score =>
+                                score.team_id === team.id && score.criteria_id === criteria.id
+                            );
+                            return score ? score.score : 0; // Если балл найден, используем его, иначе 0
                         });
-                        const totalScore = teamScores.reduce((total, score) => total + score, 0);
+
+                        const totalScore = teamScores.reduce((total, score) => total + score, 0); // Суммируем баллы для команды
 
                         return (
                             <tr key={team.id} style={{ cursor: "pointer" }}>
                                 <td>{index + 1}</td>
                                 <td>{team.name || "—"}</td>
                                 {teamScores.map((score, idx) => (
-                                    <td key={idx}>{score}</td>
+                                    <td key={idx}>{score}</td> // Отображаем баллы по каждому критерию
                                 ))}
                                 <td>{totalScore}</td>
                             </tr>
@@ -114,7 +119,7 @@ const TableForUsers = () => {
                 )}
                 </tbody>
             </Table>
-            <NavLink to={'/'} >На главную</NavLink>
+            <NavLink to={'/'}>На главную</NavLink>
         </Container>
     );
 };

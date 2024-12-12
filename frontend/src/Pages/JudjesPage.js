@@ -1,4 +1,4 @@
-import { Container } from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import Navbar from "react-bootstrap/Navbar";
 import Image from "react-bootstrap/Image";
 import Offcanvas from "react-bootstrap/Offcanvas";
@@ -7,12 +7,19 @@ import React, { useState } from "react";
 import TableTeams from "./Components/TableTeams";
 import TableJudjes from "./Components/TableJudjes";
 import {NavLink} from "react-router-dom";
+import axiosConfig from "./Components/AxiosConfig";
 
 const JudjesPage = () => {
     const expand = false; // Укажите нужный размер, если хотите, чтобы Offcanvas работал для всех размеров
     const [activeTable, setActiveTable] = useState("comp"); // Состояние для выбора таблицы
     const [selectedCompetition, setSelectedCompetition] = useState(null); // Состояние для выбранного соревнования
-
+    const handleExport = async (comp) => {
+        try{
+            let response = await axiosConfig.get(`/v0/export-csv/${comp}/by-experiment/`);
+        }catch(err){
+            console.log(err);
+        }
+    }
     const renderTable = () => {
         console.log(selectedCompetition?.id);
         // Возвращаем нужный компонент на основе состояния
@@ -93,6 +100,7 @@ const JudjesPage = () => {
                         <p>{selectedCompetition.description}</p>
                         <p>Дата начала регистрации: {selectedCompetition.start_registration}</p>
                         <p>Дата конца регистрации: {selectedCompetition.end_registration}</p>
+                        <a href='http://localhost:8000/api/v0/export-csv/1/by-experiment/'>Экспортировать .scv</a>
                     </div>
 
                 ) : (null)
