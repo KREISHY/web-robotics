@@ -16,19 +16,17 @@ class ExportCSVScoresViewSet(ViewSet):
         """Экспорт оценок по испытанию."""
         try:
             experiment = Experiment.objects.get(pk=pk)
-        except "Competition.Experiment".DoesNotExist:
+        except Experiment.DoesNotExist:
             return Response({'error': 'Experiment not found'}, status=404)
 
-        scores = Score.objects.filter(experiment=experiment)
+        scores = Score.objects.filter(experiment=experiment).order_by('-score')
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="scores_experiment_{experiment.id}.csv"'
-        writer = csv.writer(response, delimiter=',')
+        writer = csv.writer(response, delimiter=';')
 
         writer.writerow(['Team', 'Judge', 'Criteria', 'Score', 'Experiment'])
         for score in scores:
-            team = (
-                score.experiment.competition.teams.filter(pk=experiment.competition_id).first()
-            )
+            team = score.team  # Прямое обращение к объекту команды
             writer.writerow([
                 team.name if team else "Unknown",  # Проверка, существует ли команда
                 score.judge_user.username,
