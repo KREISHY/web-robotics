@@ -4,6 +4,7 @@ import axiosConfig from "./Components/AxiosConfig"; // Ваш axiosConfig для
 import { useNavigate } from 'react-router-dom'; // Для перенаправления пользователя
 
 function LoginPage() {
+    const [currentUser, setCurrentUser] = useState(null);
     const [role, setRole] = useState("user");
     const [user, setUser] = useState({
         email: "",
@@ -56,17 +57,18 @@ function LoginPage() {
             if (role === "registerUser") {
                 response = await axiosConfig.post('/users/register/', payload);
                 console.log('User registered:', response);
-                navigate("/login"); // Перенаправление на страницу входа после регистрации
+                // После регистрации можно перенаправить на страницу входа
+                navigate("/login"); // Например, редирект на страницу логина
             } else {
                 const endpoint = role === "user" ? '/users/login-email/' : '/users/login-username/';
                 response = await axiosConfig.post(endpoint, payload);
                 console.log('User logged in:', response);
-
-                // Сохраняем токен и информацию о текущем пользователе в localStorage
-                localStorage.setItem('currentUser', JSON.stringify({ loggedIn: true, user: response.data }));
-
-                // Перенаправляем на страницу после успешного входа
-                navigate("/table-teams"); // Редирект на страницу с контентом
+                // Сохраняем токен или данные пользователя в localStorage, sessionStorage или в стейт
+                setCurrentUser(true);
+                console.log('currentUser:', currentUser);
+                localStorage.setItem('currentUser', JSON.stringify(true));
+                // Перенаправляем пользователя на страницу после успешного входа
+                navigate("/"); // Редирект на страницу с контентом
             }
         } catch (error) {
             console.error('Error:', error);
