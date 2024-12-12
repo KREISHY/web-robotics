@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table } from "react-bootstrap";
 import axiosConfig from "./AxiosConfig";
+import {NavLink, useNavigate} from "react-router-dom";
 
 // Функция для преобразования даты в читаемый формат
 const formatDate = (dateString) => {
@@ -15,9 +16,14 @@ const formatDate = (dateString) => {
     });
 };
 
-const TableComands = () => {
-    const [competition, setCompetition] = useState([]);
 
+
+const TableComands = () => {
+    const navigate = useNavigate();
+    const [competition, setCompetition] = useState([]);
+    const handleOpen = (comp) => {
+        navigate(`/user-table-page/${comp}`);
+    }
     useEffect(() => {
         const fetchCompetitions = async () => {
             try {
@@ -49,7 +55,10 @@ const TableComands = () => {
                 <tbody>
                 {competition.length > 0 ? (
                     competition.map((comp, index) => (
-                        <tr key={comp.id || index}>
+                        <tr
+                            key={comp.id || index}
+                            onClick={() => handleOpen(String(comp.id))}
+                        >
                             <td>{index + 1}</td>
                             <td>{comp.name || "—"}</td>
                             <td>{comp.description || "—"}</td>
@@ -66,6 +75,7 @@ const TableComands = () => {
                 )}
                 </tbody>
             </Table>
+            <NavLink to={'/'} >На главную</NavLink>
         </Container>
     );
 };

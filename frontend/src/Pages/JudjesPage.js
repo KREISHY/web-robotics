@@ -6,6 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import React, { useState } from "react";
 import TableTeams from "./Components/TableTeams";
 import TableJudjes from "./Components/TableJudjes";
+import {NavLink} from "react-router-dom";
 
 const JudjesPage = () => {
     const expand = false; // Укажите нужный размер, если хотите, чтобы Offcanvas работал для всех размеров
@@ -80,6 +81,7 @@ const JudjesPage = () => {
                         </Offcanvas.Body>
                     </Navbar.Offcanvas>
                 </Container>
+
             </Navbar>
 
             {/* Отображение выбранной таблицы */}
@@ -96,6 +98,7 @@ const JudjesPage = () => {
                 ) : (null)
                 }
                 {renderTable()}
+                <NavLink to={'/'} >На главную</NavLink>
 
             </Container>
         </>

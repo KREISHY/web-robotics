@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { Container, Table } from "react-bootstrap";
 import axiosConfig from "./AxiosConfig";
 
@@ -16,7 +16,6 @@ const formatDate = (dateString) => {
 
 const TableJudjes = ({ setSelectedCompetition }) => {
     const [competition, setCompetition] = useState([]);
-
     useEffect(() => {
         const fetchCompetitions = async () => {
             try {

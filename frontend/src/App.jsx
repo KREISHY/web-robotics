@@ -1,7 +1,7 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './style.css';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation, NavLink } from 'react-router-dom';
 import Home from './Pages/Home';
 import LoginPage from './Pages/Profile';
 import Footer from './Footer';
@@ -9,7 +9,7 @@ import NavbarMain from "./Pages/Components/NavbarMain";
 import TableTests from "./Pages/TableTests";
 import TableComands from "./Pages/Components/TableComands";
 import JudjesPage from "./Pages/JudjesPage";
-
+import TableForUsers from "./Pages/Components/TableForUsers";
 function AppContent() {
     const location = useLocation();
 
@@ -28,8 +28,11 @@ function AppContent() {
                     <Route path="/table-teams" element={<TableTests nameTeam={'Питонисты'} />} />
                     <Route path="/table-comp" element={<TableComands />} />
                     <Route path="/judjes-page" element={<JudjesPage />} />
+                    {/* Изменили путь для передачи competitionId */}
+                    <Route path="/user-table-page/:competitionId" element={<TableForUsers />} />
                 </Routes>
             </div>
+
             <Footer />
         </div>
     );
