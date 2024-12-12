@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.http import FileResponse
 from rest_framework import viewsets, status, serializers
 from rest_framework.generics import get_object_or_404
@@ -14,7 +15,7 @@ class JudgeRegisterViewSet(viewsets.ModelViewSet):
     queryset = User.objects.none()
     serializer_class = JudgeRegisterSerializer
     permission_classes = [IsAuthenticatedAndIsOperator]
-    http_method_names = ['get', 'post' ,'head', 'options', 'list']
+    http_method_names = ['get', 'post', 'head', 'options', 'list']
 
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)
@@ -23,8 +24,15 @@ class JudgeRegisterViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user, user_data = serializer.save()
+
+            # Находим или создаем группу "Judges"
+            judges_group, created = Group.objects.get_or_create(name='Judges')
+
+            # Добавляем пользователя в группу
+            user.groups.add(judges_group)
+
             return Response({
-                "message": f"Пользователь {user.username} был успешно создан.",
+                "message": f"Пользователь {user.username} был успешно создан и добавлен в группу 'Judges'.",
                 "email": user.email,
                 "username": user.username,
                 "password": user_data['password'],
