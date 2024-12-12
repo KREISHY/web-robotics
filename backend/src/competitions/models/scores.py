@@ -30,7 +30,7 @@ class Score(models.Model):
     )
     score = MinMaxFloat(
         min_value=0.0,
-        max_value=100.0,
+        max_value=10.0,
         verbose_name='Баллы',
     )
     experiment = models.ForeignKey(
