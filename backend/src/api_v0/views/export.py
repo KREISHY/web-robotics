@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from django.http import HttpResponse
 import csv
@@ -9,7 +9,7 @@ from competitions.models import Score, Experiment, Competition, Criteria, User
 
 
 class ExportCSVScoresViewSet(ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['get'], url_path='by-experiment')
     def export_by_experiment(self, request, pk=None):
