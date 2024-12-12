@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Container, Table } from "react-bootstrap";
 import axiosConfig from "./AxiosConfig";
 
-const TableTeams = ({ selectedCompetition, onTeamSelect }) => {
+const TableTeams = ({ selectedCompetition }) => {
     const [teams, setTeams] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -21,6 +23,11 @@ const TableTeams = ({ selectedCompetition, onTeamSelect }) => {
     const filteredTeams = teams.filter(
         (team) => String(team.competition_id) === String(selectedCompetition)
     );
+
+    const handleTeam = (teamName) => {
+        localStorage.setItem('teamName', teamName);
+        navigate('/table-tests');
+    }
 
     return (
         <Container className="main-content">
@@ -43,7 +50,7 @@ const TableTeams = ({ selectedCompetition, onTeamSelect }) => {
                         <tr
                             key={team.id || index}
                             style={{ cursor: "pointer" }}
-                            onClick={() => onTeamSelect(team)} // Обрабатываем клик
+                            onClick={() => handleTeam(team.name)} // Обрабатываем клик
                         >
                             <td>{index + 1}</td>
                             <td>{team.name || "—"}</td>

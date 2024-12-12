@@ -25,7 +25,7 @@ function AppContent() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/table-teams" element={<TableTests nameTeam={'Питонисты'} />} />
+                    <Route path="/table-tests" element={<TableTests />} />
                     <Route path="/table-comp" element={<TableComands />} />
                     <Route path="/judjes-page" element={<JudjesPage />} />
                     {/* Изменили путь для передачи competitionId */}

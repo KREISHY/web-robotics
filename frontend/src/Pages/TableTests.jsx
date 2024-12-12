@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axiosConfig from "./Components/AxiosConfig";
 
-function TableTests({ nameTeam }) {
+function TableTests() {
   const [test, setTest] = useState(2);
   const [rows, setRows] = useState(
     Array.from({ length: test }, () => ({
+      competition: '',
       accuracy: '',
       speed: '',
       creativity: '',
     }))
   );
+  let nameTeam = localStorage.getItem('teamName');
 
   const checkNum = (value) => {
     return value.replace(/[^0-9]/g, '');
@@ -19,24 +20,38 @@ function TableTests({ nameTeam }) {
   const handleInputChange = (index, field, value) => {
     const newRows = [...rows];
     newRows[index][field] = checkNum(value);
+    newRows[index]["competition"] = `Испытание ${index + 1}`;
     setRows(newRows);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosConfig.post("/api/submit-data/", {
-        teamName: nameTeam,
-        tests: rows,
-      });
-      if (response.status === 200) {
-        console.log('Данные успешно отправлены');
-      } else {
-        console.error('Ошибка при отправке данных');
+  const handleAddTest = () => {
+    setTest(test + 1);
+    setRows([
+      ...rows,
+      {
+        competition: '',
+        accuracy: '',
+        speed: '',
+        creativity: '',
       }
-    } catch (error) {
-      console.error('Ошибка при отправке данных: ', error);
-    }
+    ]);
+  };
+
+  const handleDeleteTest = () => {
+    setTest(test - 1);
+    setRows([
+      ...rows,
+      {
+        competition: '',
+        accuracy: '',
+        speed: '',
+        creativity: '',
+      }
+    ]);
+  };
+
+  const handleSubmit = async (e) => {
+    alert('Данные были отправлены');
   };
 
   return (
@@ -86,6 +101,12 @@ function TableTests({ nameTeam }) {
             </tbody>
           </table>
           <div className="text-center mt-3">
+            <button type="button" className="btn btn-secondary mr-2" onClick={handleAddTest}>
+              Добавить испытание
+            </button>
+            <button type="button" className="btn btn-secondary mr-2" onClick={handleDeleteTest}>
+              Удалить испытание
+            </button>
             <button type="submit" className="btn btn-primary">Отправить</button>
           </div>
         </form>
