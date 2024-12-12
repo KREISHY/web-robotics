@@ -13,7 +13,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Experiment
-        fields = ['name', 'competition_id', 'competition_name']
+        fields = ['id', 'name', 'competition_id', 'competition_name']
+        read_only_fields = ['id']
 
 
     def validate(self, data):
