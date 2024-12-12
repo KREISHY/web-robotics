@@ -5,7 +5,7 @@ from competitions.models import Competition
 class CompetitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Competition
-        fields = ['name', 'description', 'start_registration', 'end_registration']
+        fields = ['id', 'name', 'description', 'start_registration', 'end_registration']
         read_only_fields = ['id', 'created_at']
         extra_kwargs = {
             'name': {'required': True, 'error_messages': {
