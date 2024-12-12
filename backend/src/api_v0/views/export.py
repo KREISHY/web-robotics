@@ -38,29 +38,27 @@ class ExportCSVScoresViewSet(ViewSet):
 
     @action(detail=True, methods=['get'], url_path='by-team')
     def export_by_team(self, request, pk=None):
-        """Экспорт оценок по команде."""
+        """Экспорт оценок по команде в CSV."""
         try:
             competition = Competition.objects.get(pk=pk)
         except Competition.DoesNotExist:
             return Response({'error': 'Competition not found'}, status=404)
 
         scores = Score.objects.filter(competition=competition)
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename="scores_team_{competition.id}.xlsx"'
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="scores_team_{competition.id}.csv"'
+        writer = csv.writer(response, delimiter=';')
 
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Scores"
-
-        ws.append(['Experiment', 'Judge', 'Criteria', 'Score', 'Team'])
+        writer.writerow(['Experiment', 'Judge', 'Criteria', 'Score', 'Team'])
         for score in scores:
-            ws.append([
+            team_name = score.experiment.competition.teams.filter(
+                pk=competition.id).first().name if score.experiment.competition.teams.exists() else "Unknown"
+            writer.writerow([
                 score.experiment.name,
                 score.judge_user.username,
                 score.criteria.name,
                 round(score.score, 1),
-                score.experiment.competition.teams.filter(pk=competition.id).first().name if score.experiment.competition.teams.exists() else "Unknown",
+                team_name,
             ])
 
-        wb.save(response)
         return response
