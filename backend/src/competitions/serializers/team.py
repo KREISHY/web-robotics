@@ -3,7 +3,6 @@ from competitions.models import Teams
 from competitions.validations.team_register_val import validate_team_register
 
 
-
 class TeamSSerializer(serializers.ModelSerializer):
     captain_name = serializers.CharField(source='captain.username', read_only=True)  # Отображение имени капитана
     competition_name = serializers.CharField(source='competition.name', read_only=True)  # Отображение названия соревнования
@@ -12,19 +11,22 @@ class TeamSSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
         fields = [
-            'name', 'robot_name', 'city', 'institution', 'members',
+            'id', 'name', 'robot_name', 'city', 'institution', 'members',
             'leader', 'captain_name', 'contact_phone', 'comments', 'status',
             'competition_name', 'competition_id'
         ]
+        read_only_fields = ['id']
+
 
 class TeamRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
         fields = [
-            'name','robot_name', 'city',
+            'id', 'name', 'robot_name', 'city',
             'institution', 'members', 'leader',
             'contact_phone', 'comments', 'competition'
         ]
+        read_only_fields = ['id']
 
         extra_kwargs = {
             'name': {

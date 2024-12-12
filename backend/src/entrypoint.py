@@ -16,6 +16,7 @@ try:
         User.objects.create_superuser(
             email=SUPERUSER_EMAIL,
             password=SUPERUSER_PASSWORD,
+            username='admin',
             first_name='Admin',
             last_name='Admin',
             patronymic='Admin',

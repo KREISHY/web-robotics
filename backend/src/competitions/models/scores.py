@@ -1,6 +1,6 @@
 from django.db import models
 from .utils import MinMaxFloat
-from competitions.models import Competition, Criteria
+from competitions.models import Competition, Criteria, Teams
 from users.models import User
 
 
@@ -10,6 +10,11 @@ class Score(models.Model):
         on_delete=models.CASCADE,
         related_name="scores",
         verbose_name="Соревнование",
+    )
+    team = models.ForeignKey(
+        Teams,
+        on_delete=models.CASCADE,
+        verbose_name='Команда',
     )
     judge_user = models.ForeignKey(
         User,
@@ -27,6 +32,11 @@ class Score(models.Model):
         min_value=0.0,
         max_value=100.0,
         verbose_name='Баллы',
+    )
+    experiment = models.ForeignKey(
+        'competitions.Experiment',
+        on_delete=models.CASCADE,
+        verbose_name='Задание',
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
