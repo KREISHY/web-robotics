@@ -56,16 +56,17 @@ function LoginPage() {
             if (role === "registerUser") {
                 response = await axiosConfig.post('/users/register/', payload);
                 console.log('User registered:', response);
-                // После регистрации можно перенаправить на страницу входа
-                navigate("/login"); // Например, редирект на страницу логина
+                navigate("/login"); // Перенаправление на страницу входа после регистрации
             } else {
                 const endpoint = role === "user" ? '/users/login-email/' : '/users/login-username/';
                 response = await axiosConfig.post(endpoint, payload);
                 console.log('User logged in:', response);
-                // Сохраняем токен или данные пользователя в localStorage, sessionStorage или в стейт
-                localStorage.setItem('authToken', response.data.token); // Пример, если сервер отдает токен
-                // Перенаправляем пользователя на страницу после успешного входа
-                navigate("/dashboard"); // Редирект на страницу с контентом
+
+                // Сохраняем токен и информацию о текущем пользователе в localStorage
+                localStorage.setItem('currentUser', JSON.stringify({ loggedIn: true, user: response.data }));
+
+                // Перенаправляем на страницу после успешного входа
+                navigate("/table-teams"); // Редирект на страницу с контентом
             }
         } catch (error) {
             console.error('Error:', error);

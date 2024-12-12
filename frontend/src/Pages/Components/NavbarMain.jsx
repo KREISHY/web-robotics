@@ -54,6 +54,7 @@ function NavbarMain() {
                                 <Nav className="justify-content-end flex-grow-1 pe-3">
                                     <NavLink to='/' style={{ fontSize: '36px' }}>Домой</NavLink>
                                     <NavLink to='/login' style={{ fontSize: '36px' }}>Вход</NavLink>
+                                    <NavLink to='/table-comp' style={{ fontSize: '36px' }}>Соревнования</NavLink>
                                     <NavLink to='/contacts' style={{ fontSize: '36px' }}>Контакты</NavLink>
                                 </Nav>
                             </Offcanvas.Body>
