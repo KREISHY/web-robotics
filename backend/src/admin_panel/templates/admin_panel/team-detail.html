@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Детальная информация о команде: {{ team.name }}</h1>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Название команды:</th>
+                            <td>{{ team.name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Название робота:</th>
+                            <td>{{ team.robot_name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Город:</th>
+                            <td>{{ team.city }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Учебное заведение:</th>
+                            <td>{{ team.institution }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Капитан:</th>
+                            <td>{{ team.captain.username }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Статус:</th>
+                            <td>
+                                <!-- Выпадающий список для изменения статуса -->
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <select name="status" class="form-control">
+                                        {% for value, display in status_choices %}
+                                            <option value="{{ value }}" {% if team.status == value %}selected{% endif %}>{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-success mt-3">Сохранить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Члены команды:</th>
+                            <td>
+                                <ul>
+                                    {% for member in members_list %}
+                                        <li>{{ member }}</li>
+                                    {% empty %}
+                                        <li>Нет данных о членах команды</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="font-weight-bold">Контактный телефон:</th>
+                            <td>{{ team.contact_phone }}</td>
+                        </tr>
+                        {% if team.comments %}
+                            <tr>
+                                <th scope="row" class="font-weight-bold">Комментарий:</th>
+                                <td>{{ team.comments }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                <div class="text-center">
+                    <a href="{% url 'teams-admin-list' %}" class="btn btn-secondary">Назад</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

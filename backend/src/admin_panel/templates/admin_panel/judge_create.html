@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Создание судьи</h1>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <!-- Форма создания судьи -->
+            <form id="create-judge-form">
+                {% csrf_token %}
+                <div class="form-group mt-3">
+                    <label for="email">Email (не обязателен)</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Введите email">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Введите имя пользователя">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="password">Пароль (не обязателен)</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="first_name">Имя</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="Введите имя">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="last_name">Фамилия</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Введите фамилию">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="patronymic">Отчество (не обязателен)</label>
+                    <input type="text" id="patronymic" name="patronymic" class="form-control" placeholder="Введите отчество">
+                </div>
+                <div class="text-center mt-4">
+                    <button id="create-judge-btn" type="button" class="btn btn-primary" onclick="createJudge()">Создать судью</button>
+                </div>
+            </form>
+
+            <div id="success-message" class="alert alert-success mt-3 d-none">
+                Судья успешно создан! <br>
+                <strong>Имя пользователя:</strong> <span id="username-output"></span> <br>
+                <strong>Пароль:</strong> <span id="password-output"></span>
+            </div>
+
+            <div id="error-message" class="alert alert-danger mt-3 d-none">
+                <strong>Ошибка!</strong> Пожалуйста, исправьте следующие ошибки:
+                <ul id="error-list"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+    function createJudge() {
+        // Останавливаем стандартное поведение кнопки
+        event.preventDefault();
+
+        // Сбор данных из формы
+        const formData = {
+            email: $('#email').val(),
+            username: $('#username').val(),
+            password: $('#password').val(),
+            first_name: $('#first_name').val(),
+            last_name: $('#last_name').val(),
+            patronymic: $('#patronymic').val(),
+        };
+
+        // Очистка предыдущих сообщений
+        $('#success-message').addClass('d-none');
+        $('#error-message').addClass('d-none');
+        $('#error-list').empty();
+
+        // Отправка данных на API через AJAX
+        $.ajax({
+            url: '{% url 'judge-register-list' %}',  // Замените на правильный URL вашего API
+            method: 'POST',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: JSON.stringify(formData),
+            success: function(response) {
+                // Если все прошло успешно, выводим данные
+                $('#success-message').removeClass('d-none');
+                $('#username-output').text(response.username);
+                $('#password-output').text(response.password);
+            },
+            error: function(xhr) {
+                // Если ошибка, выводим ошибки с сервера
+                const errors = xhr.responseJSON;
+                $('#error-message').removeClass('d-none');
+
+                if (errors) {
+                    $.each(errors, function(field, messages) {
+                        $('#error-list').append('<li>' + messages.join(', ') + '</li>');
+                    });
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
