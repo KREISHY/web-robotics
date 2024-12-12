@@ -2,6 +2,7 @@ from django.urls import path
 
 from admin_panel.views.admin_login import admin_login
 from admin_panel.views.admin_main import admin_main
+from admin_panel.views.competitions_views import CompetitionDetailView, CompetitionListView
 from admin_panel.views.judges_views import JudgesListView, JudgeDetailView, CreateJudgeView
 from admin_panel.views.teams import TeamListView, TeamDetailView
 
@@ -13,5 +14,7 @@ urlpatterns = [
     path('judge-create/', CreateJudgeView.as_view(), name='judge-admin-create'),
     path('teams-list/', TeamListView.as_view(), name='teams-admin-list'),
     path('team-detail/<pk>', TeamDetailView.as_view(), name='team-admin-detail'),
+    path('competitions-list/', CompetitionListView.as_view(), name='competitions-admin-list'),
+    path('competition-detail/<pk>', CompetitionDetailView.as_view(), name='competition-admin-detail'),
 ]
 
