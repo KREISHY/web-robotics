@@ -100,7 +100,7 @@ const JudjesPage = () => {
                         <p>{selectedCompetition.description}</p>
                         <p>Дата начала регистрации: {selectedCompetition.start_registration}</p>
                         <p>Дата конца регистрации: {selectedCompetition.end_registration}</p>
-                        <a href='http://localhost:8000/api/v0/export-csv/1/by-experiment/'>Экспортировать .scv</a>
+                        <a href={`http://localhost:8000/api/v0/export-csv/${selectedCompetition.id}/by-experiment/`}>Экспортировать .scv</a>
                     </div>
 
                 ) : (null)
