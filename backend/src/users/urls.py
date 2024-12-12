@@ -2,9 +2,10 @@ from os.path import basename
 
 from rest_framework import routers
 
+from competitions.serializers import CompetitionJudgesSerializer
 from config import URL_EMAIL_VERIFY, URL_PASSWORD_RESET_VERIFY
 from users.views.auth import CurrentUserViewSet, LoginByEmailViewSet, LoginByUsernameViewSet, UserLogoutViewSet
-from users.views.judge_register import JudgeRegisterViewSet
+from users.views.judge_register import JudgeRegisterViewSet, CompetitionJudgesViewSet
 from users.views.judges import JudgeViewSet
 from users.views.operator_register import OperatorViewSet
 from users.views.registration import UserRegistrationView
@@ -28,7 +29,7 @@ router.register(r'judge-register', JudgeRegisterViewSet, basename='judge-registe
 router.register(r'operator-register', OperatorViewSet, basename='operator-register')
 router.register(r'judges', JudgeViewSet, basename='judges')
 router.register(r'operators', OperatorViewSet, basename='operators')
-
+router.register(r'assign-judge-to-competition', CompetitionJudgesViewSet ,basename='assign-judge-to-competition')
 
 urlpatterns = [
 ]

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'users',
     'admin_panel',
     'competitions',
+    "django_bootstrap5",
 ]
 
 MIDDLEWARE = [

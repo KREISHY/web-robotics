@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from competitions.models import Competition, CompetitionJudges
 from config import URL_EMAIL_VERIFY, ROOT_URL, URL_USERS_API, URL_PASSWORD_RESET_VERIFY
 from users.models import User, EmailVerify, PasswordReset
 from users.utils import generate_random_password, generate_uuid

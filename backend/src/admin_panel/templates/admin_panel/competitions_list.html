@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Список соревнований</h1>
+
+        <!-- Если нет соревнований -->
+        {% if competitions %}
+            <div class="row">
+                {% for competition in competitions %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ competition.name }}</h5>
+                                <p class="card-text">{{ competition.description|truncatewords:20 }}</p>
+                                <p class="card-text">
+                                    <strong>Дата начала регистрации:</strong> {{ competition.start_registration|date:"d-m-Y H:i" }}<br>
+                                    <strong>Дата окончания регистрации:</strong> {{ competition.end_registration|date:"d-m-Y H:i" }}
+                                </p>
+                                <a href="{% url 'competition-admin-detail' competition.id %}" class="btn btn-primary">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Нет доступных соревнований.</p>
+        {% endif %}
+    </div>
+{% endblock %}
