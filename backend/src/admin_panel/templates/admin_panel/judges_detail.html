@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Детальная информация о судье</h1>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    <tr>
+                        <th scope="row" class="font-weight-bold">Имя:</th>
+                        <td>{{ judge.first_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="font-weight-bold">Фамилия:</th>
+                        <td>{{ judge.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="font-weight-bold">Имя пользователя:</th>
+                        <td>{{ judge.username }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="font-weight-bold">Email:</th>
+                        <td>{{ judge.email }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="mt-4">Назначенные соревнования:</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Название соревнования</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for competition_judge in assigned_competitions %}
+                        <tr>
+                            <td>{{ competition_judge.competition.name }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'assign-judge-to-competition-list' competition_judge.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center">Судья не назначен на соревнования.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h3 class="mt-4">Назначить судью на соревнование:</h3>
+            <div id="error-message" class="alert alert-danger d-none"></div>
+            <form id="assign-judge-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="competition-select">Выберите соревнование</label>
+                    <select id="competition-select" name="competition" class="form-control">
+                        <option value="">Выберите соревнование</option>
+                        {% for competition in competitions %}
+                            <option value="{{ competition.id }}">{{ competition.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Назначить</button>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'judges-admin-list' %}" class="btn btn-secondary">Назад</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block additional_scripts %}
+<script>
+    $(document).ready(function() {
+        // Обработка отправки формы с использованием AJAX
+        $('#assign-judge-form').on('submit', function(e) {
+            e.preventDefault();
+
+            const judgeId = {{ judge.id }};  // Получаем ID судьи из контекста
+            const competitionId = $('#competition-select').val();
+
+            // Проверяем, выбрано ли соревнование
+            if (!competitionId) {
+                $('#error-message').text("Пожалуйста, выберите соревнование.").removeClass('d-none');
+                return;
+            }
+
+            // Формируем данные для отправки в формате JSON
+            const data = {
+                judge: judgeId,
+                competition: competitionId
+            };
+
+            // Отправляем AJAX запрос
+            $.ajax({
+                url: "{% url 'assign-judge-to-competition-list' %}",  // URL API для назначения
+                method: "POST",
+                contentType: "application/json",  // Устанавливаем контент в формате JSON
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: JSON.stringify(data),  // Преобразуем данные в строку JSON
+                success: function(response) {
+                    // Если все прошло успешно, обновляем страницу
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    // Если ошибка, выводим сообщение
+                    const errorMsg = xhr.responseJSON ? xhr.responseJSON.detail : 'Произошла ошибка.';
+                    $('#error-message').text(errorMsg).removeClass('d-none');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

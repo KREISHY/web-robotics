@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import viewsets, permissions, status
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -114,9 +115,6 @@ class LoginByUsernameViewSet(ModelViewSet):
 
                 login(request, user)
                 return Response(status=status.HTTP_200_OK)
-
-            return Response({'status': 'error', 'message': 'Предоставлены неверные данные'},
-                            status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

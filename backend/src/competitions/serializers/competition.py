@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from competitions.models import Competition
+from competitions.models import Competition, CompetitionJudges
+from users.models import User
 
 
 class CompetitionSerializer(serializers.ModelSerializer):
@@ -48,3 +49,25 @@ class CompetitionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Соревнование с таким названием уже существует.")
         return value
 
+
+class CompetitionJudgesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompetitionJudges
+        fields = ['judge', 'competition']
+
+    def validate(self, data):
+        # Проверяем, существует ли судья
+        try:
+            judge = User.objects.get(id=data['judge'].id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"judge": "Судья не найден."})
+
+        # Проверяем, существует ли соревнование
+        try:
+            competition = Competition.objects.get(id=data['competition'].id)
+        except Competition.DoesNotExist:
+            raise serializers.ValidationError({"competition": "Соревнование не найдено."})
+
+        if CompetitionJudges.objects.filter(judge=judge, competition=competition).exists():
+            raise serializers.ValidationError({"judge": "Судья уже прикреплён к данному соревнованию"})
+        return data

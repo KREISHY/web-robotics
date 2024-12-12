@@ -157,13 +157,20 @@ def custom_validate_username_login(username):
 def custom_validate_password_login(data):
     password = data.get('password')
     email = data.get('email')
+    username = data.get('username')
 
     if not password:
         raise serializers.ValidationError({"password": "Пожалуйста, введите ваш пароль."})
 
-    user = User.objects.filter(email=email).first()
-    if user and not check_password(password, user.password):
-        raise serializers.ValidationError({"password": "Неверный пароль."})
+    if email:
+        user = User.objects.filter(email=email).first()
+        if user and not check_password(password, user.password):
+            raise serializers.ValidationError({"password": "Неверный пароль."})
+
+    if username:
+        user = User.objects.filter(username=username).first()
+        if user and not check_password(password, user.password):
+            raise serializers.ValidationError({'password': 'Неверный пароль'})
 
 def custom_validate_user_login(data):
     custom_validate_password_login(data)
