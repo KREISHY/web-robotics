@@ -92,8 +92,10 @@ const TableForUsers = () => {
                         const teamScores = criterias.map(criteria => {
                             // Ищем балл для этой команды и критерия
                             const score = scores.find(score =>
-                                score.team_id === team.id && score.criteria_id === criteria.id
+                                String(score.team_id) === String(team.id) && String(score.criteria_id) === String(criteria.id)
                             );
+                            // Логируем баллы для каждого критерия
+                            console.log(`Команда: ${team.name}, Критерий: ${criteria.name}, Балл: ${score ? score.score : 0}`);
                             return score ? score.score : 0; // Если балл найден, используем его, иначе 0
                         });
 
