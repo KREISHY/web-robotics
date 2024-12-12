@@ -15,7 +15,7 @@ class JudgesListView(ListView):
     def get_queryset(self):
         queryset = User.objects.annotate(
             is_judge_status=Case(
-                When(groups__name='Operators', then=Value(True)),
+                When(groups__name='Judges', then=Value(True)),
                 default=Value(False),
                 output_field=BooleanField(),
             )
