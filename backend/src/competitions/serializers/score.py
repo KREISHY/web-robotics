@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from competitions.models import Score, Competition, Criteria, Experiment
+from competitions.models import Score, Competition, Criteria, Experiment, Teams
 from users.models import User
 
 
@@ -8,21 +8,26 @@ class ScoreSerializer(serializers.ModelSerializer):
     criteria_name = serializers.CharField(source='criteria.name', read_only=True)
     judge_name = serializers.CharField(source='judge_user.username', read_only=True)
     experiment_name = serializers.CharField(source='experiment.name', read_only=True)
+    team_name = serializers.CharField(source='team.name', read_only=True)
 
     competition_id = serializers.CharField(source='competition.id', read_only=True)
     criteria_id = serializers.CharField(source='criteria.id', read_only=True)
     judge_id = serializers.CharField(source='judge_user.id', read_only=True)
     experiment_id = serializers.CharField(source='experiment.id', read_only=True)
+    team_id = serializers.CharField(source='team.id', read_only=True)
 
     competition = serializers.PrimaryKeyRelatedField(queryset=Competition.objects.all(), write_only=True)
     judge_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
     criteria = serializers.PrimaryKeyRelatedField(queryset=Criteria.objects.all(), write_only=True)
     experiment = serializers.PrimaryKeyRelatedField(queryset=Experiment.objects.all(), write_only=True)
+    team = serializers.PrimaryKeyRelatedField(queryset=Teams.objects.all(), write_only=True)
 
     class Meta:
         model = Score
         fields = [
-            'id', 'competition', 'competition_name',
+            'id',
+            'competition', 'competition_name',
+            'team', 'team_id', 'team_name',
             'judge_user', 'judge_name',
             'criteria', 'criteria_name',
             'experiment', 'experiment_name',
@@ -30,7 +35,9 @@ class ScoreSerializer(serializers.ModelSerializer):
             'score', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'competition_name', 'judge_name', 'criteria_name', 'experiment_name',
+            'id', 'competition_name',
+            'team_id', 'team_name',
+            'judge_name', 'criteria_name', 'experiment_name',
             'competition_id', 'criteria_id', 'judge_id', 'experiment_id',
             'created_at', 'updated_at'
         ]
@@ -60,12 +67,14 @@ class ScoreSerializer(serializers.ModelSerializer):
         judge_user = data.get('judge_user')
         criteria = data.get('criteria')
         experiment = data.get('experiment')
+        team = data.get('team')
 
         if Score.objects.filter(
             competition=competition,
             judge_user=judge_user,
             criteria=criteria,
-            experiment=experiment
+            experiment=experiment,
+            team=team,
         ).exists():
             raise serializers.ValidationError(
                 'Судья уже оценил это испытание по данному критерию в рамках соревнования.'

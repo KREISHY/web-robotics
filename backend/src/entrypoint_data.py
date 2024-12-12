@@ -111,6 +111,7 @@ def create_scores(competitions, teams, judges, criteria_list, experiments):
                             criteria=criteria,
                             score=random.uniform(50, 100),
                             experiment=experiment,
+                            team=team,
                         )
 
 
