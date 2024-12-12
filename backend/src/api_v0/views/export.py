@@ -13,27 +13,52 @@ class ExportCSVScoresViewSet(ViewSet):
 
     @action(detail=True, methods=['get'], url_path='by-experiment')
     def export_by_experiment(self, request, pk=None):
-        """Экспорт оценок по испытанию."""
+        """Экспорт оценок по испытанию с каждым судьей в отдельном столбце, исключая строки с N/A, если все оценки судей N/A."""
         try:
             experiment = Experiment.objects.get(pk=pk)
         except Experiment.DoesNotExist:
             return Response({'error': 'Experiment not found'}, status=404)
 
-        scores = Score.objects.filter(experiment=experiment).order_by('-score')
+        # Получаем все оценки для данного эксперимента
+        scores = Score.objects.filter(experiment=experiment).select_related('judge_user', 'criteria')
+
+        # Собираем список уникальных судей
+        judges = scores.values_list('judge_user__username', flat=True).distinct()
+
+        # Подготовка ответа CSV
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="scores_experiment_{experiment.id}.csv"'
         writer = csv.writer(response, delimiter=';')
 
-        writer.writerow(['Team', 'Judge', 'Criteria', 'Score', 'Experiment'])
-        for score in scores:
-            team = score.team  # Прямое обращение к объекту команды
-            writer.writerow([
-                team.name if team else "Unknown",  # Проверка, существует ли команда
-                score.judge_user.username,
-                score.criteria.name,
-                round(score.score, 1),  # Округление до одной десятичной
-                score.experiment.name,
-            ])
+        # Заголовки CSV: Эксперимент, Критерий, Команда и все судьи
+        header = ['Experiment', 'Criteria', 'Team'] + [f'{judge}' for judge in judges]
+        writer.writerow(header)
+
+        # Получаем все команды для данного эксперимента
+        teams = experiment.competition.teams.all()
+
+        # Для каждой команды и критерия пишем строку
+        for team in teams:
+            for criterion in Criteria.objects.all():
+                row = [experiment.name, criterion.name, team.name]
+
+                row_with_scores = row.copy()  # Копируем начало строки, чтобы не модифицировать оригинал
+                all_na = True  # Флаг для проверки, есть ли хотя бы один балл, отличный от "N/A"
+
+                # Заполняем баллами для каждого судьи
+                for judge in judges:
+                    score = scores.filter(experiment=experiment, criteria=criterion, judge_user__username=judge,
+                                          team=team).first()
+                    if score:
+                        row_with_scores.append(round(score.score, 1))  # Если есть оценка, добавляем ее
+                        all_na = False  # Если есть оценка, флаг меняем на False
+                    else:
+                        row_with_scores.append("N/A")  # Если оценки нет, пишем "N/A"
+
+                # Если в строке есть хотя бы один действительный балл, записываем строку, иначе пропускаем
+                if not all_na:
+                    writer.writerow(row_with_scores)
+
         return response
 
     @action(detail=True, methods=['get'], url_path='by-team')
