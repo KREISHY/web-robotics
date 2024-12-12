@@ -14,22 +14,17 @@ function NavbarMain() {
     const navigate = useNavigate();
 
     useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-        setCurrentUser(JSON.parse(user));
-    } else {
-        axiosConfig.get("/users/current-user/")
-            .then(res => {
-                console.log('User is authenticated');
-                setCurrentUser(true);
-                localStorage.setItem('currentUser', JSON.stringify(true));
-            })
-            .catch(error => {
-                console.error("Error fetching user:", error);
-                setCurrentUser(false);
-                localStorage.setItem('currentUser', JSON.stringify(false));
-            });
-        }
+    axiosConfig.get("/users/current-user/")
+        .then(res => {
+            console.log('User is authenticated');
+            setCurrentUser(true);
+            localStorage.setItem('currentUser', JSON.stringify(true));
+        })
+        .catch(error => {
+            console.error("Error fetching user:", error);
+            setCurrentUser(false);
+            localStorage.setItem('currentUser', JSON.stringify(false));
+        });
     }, []);
     // Обработчик для перехода на страницу логина
     const handleLogin = () => {
@@ -101,7 +96,6 @@ function NavbarMain() {
                                     {!currentUser ? (
                                         <NavLink to='/login' style={{ fontSize: '36px' }}>Вход</NavLink>
                                     ) : <></>}
-                                    <NavLink to='/login' style={{ fontSize: '36px' }}>Вход</NavLink>
                                     <NavLink to='/table-comp' style={{ fontSize: '36px' }}>Соревнования</NavLink>
                                     <NavLink to='/contacts' style={{ fontSize: '36px' }}>Контакты</NavLink>
                                 </Nav>

@@ -68,7 +68,11 @@ function LoginPage() {
                 console.log('currentUser:', currentUser);
                 localStorage.setItem('currentUser', JSON.stringify(true));
                 // Перенаправляем пользователя на страницу после успешного входа
-                navigate("/"); // Редирект на страницу с контентом
+                if (role === 'user') {
+                    navigate("/table-comp"); // Редирект на страницу с контентом
+                } else {
+                    navigate("/judjes-page");
+                }
             }
         } catch (error) {
             console.error('Error:', error);
