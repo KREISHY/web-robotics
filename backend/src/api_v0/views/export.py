@@ -30,8 +30,8 @@ class ExportCSVScoresViewSet(ViewSet):
         response['Content-Disposition'] = f'attachment; filename="scores_experiment_{experiment.id}.csv"'
         writer = csv.writer(response, delimiter=';')
 
-        # Заголовки CSV: Эксперимент, Критерий, Команда и все судьи
-        header = ['Experiment', 'Criteria', 'Team'] + [f'{judge}' for judge in judges]
+        # Заголовки CSV: Эксперимент, Критерий, Команда и все судьи + сумма
+        header = ['Experiment', 'Criteria', 'Team'] + [f'{judge}' for judge in judges] + ['Total']
         writer.writerow(header)
 
         # Получаем все команды для данного эксперимента
@@ -43,6 +43,7 @@ class ExportCSVScoresViewSet(ViewSet):
                 row = [experiment.name, criterion.name, team.name]
 
                 row_with_scores = row.copy()  # Копируем начало строки, чтобы не модифицировать оригинал
+                total_score = 0  # Переменная для подсчета суммы
                 all_na = True  # Флаг для проверки, есть ли хотя бы один балл, отличный от "N/A"
 
                 # Заполняем баллами для каждого судьи
@@ -51,12 +52,14 @@ class ExportCSVScoresViewSet(ViewSet):
                                           team=team).first()
                     if score:
                         row_with_scores.append(round(score.score, 1))  # Если есть оценка, добавляем ее
+                        total_score += score.score  # Добавляем к общей сумме
                         all_na = False  # Если есть оценка, флаг меняем на False
                     else:
                         row_with_scores.append("N/A")  # Если оценки нет, пишем "N/A"
 
                 # Если в строке есть хотя бы один действительный балл, записываем строку, иначе пропускаем
                 if not all_na:
+                    row_with_scores.append(round(total_score, 1))  # Добавляем сумму
                     writer.writerow(row_with_scores)
 
         return response
@@ -80,8 +83,8 @@ class ExportCSVScoresViewSet(ViewSet):
         response['Content-Disposition'] = f'attachment; filename="scores_team_{competition.id}.csv"'
         writer = csv.writer(response, delimiter=';')
 
-        # Заголовки CSV: Эксперимент, Критерий, Команда и все судьи
-        header = ['Experiment', 'Criteria', 'Team'] + [f'{judge}' for judge in judges]
+        # Заголовки CSV: Эксперимент, Критерий, Команда, все судьи и сумма
+        header = ['Experiment', 'Criteria', 'Team'] + [f'{judge}' for judge in judges] + ['Total']
         writer.writerow(header)
 
         # Группируем оценки по эксперименту и критерию
@@ -94,21 +97,26 @@ class ExportCSVScoresViewSet(ViewSet):
 
                 # Заполняем баллами для каждого судьи
                 row_with_scores = row.copy()  # Копируем начало строки, чтобы не модифицировать оригинал
+                total_score = 0  # Переменная для подсчета суммы
                 all_na = True  # Флаг для проверки, есть ли хотя бы один балл, отличный от "N/A"
 
+                # Заполняем баллами для каждого судьи
                 for judge in judges:
                     score = scores.filter(experiment=experiment, criteria=criterion, judge_user__username=judge).first()
                     if score:
                         row_with_scores.append(round(score.score, 1))  # Если есть оценка, добавляем ее
+                        total_score += score.score  # Добавляем к общей сумме
                         all_na = False  # Если есть оценка, флаг меняем на False
                     else:
                         row_with_scores.append("N/A")  # Если оценки нет, пишем "N/A"
 
                 # Если в строке есть хотя бы один действительный балл, записываем строку, иначе пропускаем
                 if not all_na:
+                    row_with_scores.append(round(total_score, 1))  # Добавляем сумму
                     writer.writerow(row_with_scores)
 
         return response
+
 
 
 
