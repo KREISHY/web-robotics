@@ -98,6 +98,7 @@ function NavbarMain() {
                                     ) : <></>}
                                     <NavLink to='/table-comp' style={{ fontSize: '36px' }}>Соревнования</NavLink>
                                     <NavLink to='/contacts' style={{ fontSize: '36px' }}>Контакты</NavLink>
+                                    <NavLink to='http://localhost:8000/administrator' style={{ fontSize: '36px' }}>Для волонтеров</NavLink>
                                 </Nav>
                             </Offcanvas.Body>
                         </Navbar.Offcanvas>
